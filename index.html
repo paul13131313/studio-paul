@@ -1,0 +1,715 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>AI STUDIO PAUL — TOKYO</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;700;900&family=Barlow+Condensed:wght@300;400;600;700&family=Courier+Prime:wght@400;700&family=Noto+Sans+JP:wght@300;400;700&display=swap" rel="stylesheet">
+<style>
+* { margin: 0; padding: 0; box-sizing: border-box; }
+
+:root {
+  --bg: #111111;
+  --bg-deep: #0a0a0a;
+  --fg: #e8e0d0;
+  --cream: #f5edd6;
+  --warm: #d4a853;
+  --warm-dim: rgba(212,168,83,0.15);
+  --orange: #e8853a;
+  --muted: #6b6256;
+  --card-bg: #161413;
+  --card-border: #2a2520;
+}
+
+html { scroll-behavior: smooth; }
+
+body {
+  background: var(--bg);
+  color: var(--fg);
+  font-family: 'Noto Sans JP', 'Barlow Condensed', sans-serif;
+  font-weight: 300;
+  overflow-x: hidden;
+}
+
+body::before {
+  content: '';
+  position: fixed;
+  top: 0; left: 0; width: 100%; height: 100%;
+  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='0.03'/%3E%3C/svg%3E");
+  pointer-events: none;
+  z-index: 9999;
+}
+
+/* HERO */
+.hero {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  position: relative;
+  overflow: hidden;
+  background: var(--bg-deep);
+}
+
+.hero::before {
+  content: '';
+  position: absolute;
+  top: 50%; left: 50%;
+  width: 500px; height: 500px;
+  transform: translate(-50%, -50%);
+  background: radial-gradient(circle, rgba(212,168,83,0.07) 0%, transparent 70%);
+  animation: glowPulse 4s ease-in-out infinite alternate;
+}
+
+@keyframes glowPulse {
+  0% { opacity: 0.6; transform: translate(-50%, -50%) scale(1); }
+  100% { opacity: 1; transform: translate(-50%, -50%) scale(1.15); }
+}
+
+.hero-logo {
+  position: relative;
+  z-index: 1;
+  width: clamp(160px, 25vw, 260px);
+  height: auto;
+  animation: logoIn 1.5s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+  opacity: 0;
+  transform: scale(0.9);
+  filter: drop-shadow(0 0 40px rgba(212,168,83,0.15));
+}
+
+@keyframes logoIn {
+  to { opacity: 1; transform: scale(1); }
+}
+
+.hero-line {
+  position: relative;
+  z-index: 1;
+  width: 1px;
+  height: 50px;
+  background: linear-gradient(to bottom, var(--warm), transparent);
+  margin-top: 3rem;
+  animation: fadeUp 1s 0.8s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+  opacity: 0;
+}
+
+@keyframes fadeUp { to { opacity: 1; transform: translateY(0); } }
+
+/* NAV */
+nav {
+  position: sticky;
+  top: 0;
+  z-index: 100;
+  background: rgba(10,10,10,0.9);
+  backdrop-filter: blur(20px);
+  border-bottom: 1px solid var(--card-border);
+  padding: 0.8rem 2rem;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.nav-logo {
+  height: 32px;
+  width: auto;
+  filter: drop-shadow(0 0 6px rgba(212,168,83,0.12));
+  opacity: 0.9;
+  transition: opacity 0.3s;
+}
+
+.nav-logo:hover { opacity: 1; }
+
+nav .nav-links {
+  display: flex;
+  gap: 2.5rem;
+  list-style: none;
+}
+
+nav .nav-links a {
+  font-family: 'Barlow Condensed', sans-serif;
+  font-weight: 600;
+  font-size: 0.75rem;
+  letter-spacing: 0.25em;
+  color: var(--muted);
+  text-decoration: none;
+  transition: color 0.3s;
+  text-transform: uppercase;
+}
+
+nav .nav-links a:hover { color: var(--warm); }
+
+/* FILTER */
+.filter-bar {
+  padding: 3rem 2rem 0;
+  max-width: 1000px;
+  margin: 0 auto;
+  display: flex;
+  gap: 0.6rem;
+  flex-wrap: wrap;
+  justify-content: center;
+}
+
+.filter-btn {
+  font-family: 'Barlow Condensed', sans-serif;
+  font-weight: 600;
+  font-size: 0.68rem;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  padding: 0.5rem 1.3rem;
+  border: 1px solid var(--card-border);
+  background: transparent;
+  color: var(--muted);
+  cursor: pointer;
+  transition: all 0.3s;
+}
+
+.filter-btn:hover,
+.filter-btn.active {
+  border-color: var(--warm);
+  color: var(--cream);
+  background: var(--warm-dim);
+}
+
+/* SECTION */
+.section {
+  max-width: 1000px;
+  margin: 0 auto;
+  padding: 2.5rem 2rem 4rem;
+}
+
+.section-header {
+  text-align: center;
+  margin-bottom: 2rem;
+}
+
+.section-label {
+  font-family: 'Courier Prime', monospace;
+  font-size: 0.6rem;
+  letter-spacing: 0.4em;
+  color: var(--warm);
+  text-transform: uppercase;
+  margin-bottom: 0.6rem;
+}
+
+.section-title {
+  font-family: 'Playfair Display', serif;
+  font-weight: 900;
+  font-size: clamp(2rem, 5vw, 3rem);
+  letter-spacing: 0.02em;
+  color: var(--cream);
+}
+
+.section-count {
+  font-family: 'Courier Prime', monospace;
+  font-size: 0.65rem;
+  color: var(--muted);
+  letter-spacing: 0.15em;
+  margin-top: 0.5rem;
+}
+
+/* WORKS LIST */
+.works-list {
+  display: flex;
+  flex-direction: column;
+  gap: 1px;
+  background: var(--card-border);
+  border: 1px solid var(--card-border);
+}
+
+.work-item {
+  background: var(--card-bg);
+  padding: 1.3rem 1.6rem;
+  display: grid;
+  grid-template-columns: 2.2rem 1fr auto;
+  align-items: center;
+  gap: 1.2rem;
+  text-decoration: none;
+  color: inherit;
+  transition: all 0.3s;
+  position: relative;
+}
+
+.work-item:hover {
+  background: #1c1917;
+  padding-left: 2rem;
+}
+
+.work-item.hidden { display: none; }
+
+.item-num {
+  font-family: 'Courier Prime', monospace;
+  font-size: 0.6rem;
+  color: var(--muted);
+  letter-spacing: 0.05em;
+}
+
+.item-main {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: 0.5rem 1rem;
+  min-width: 0;
+}
+
+.item-title {
+  font-family: 'Playfair Display', serif;
+  font-weight: 700;
+  font-size: 1.15rem;
+  color: var(--cream);
+  white-space: nowrap;
+  transition: color 0.3s;
+}
+
+.work-item:hover .item-title { color: var(--warm); }
+
+.item-tags {
+  display: flex;
+  gap: 0.4rem;
+  flex-shrink: 0;
+}
+
+.tag {
+  font-family: 'Courier Prime', monospace;
+  font-size: 0.5rem;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  padding: 0.2rem 0.5rem;
+  border: 1px solid rgba(212,168,83,0.2);
+  color: var(--warm);
+  background: rgba(212,168,83,0.05);
+}
+
+.tag.type {
+  border-color: rgba(232,133,58,0.2);
+  color: var(--orange);
+  background: rgba(232,133,58,0.05);
+}
+
+.item-desc {
+  width: 100%;
+  font-size: 0.75rem;
+  color: var(--muted);
+  line-height: 1.5;
+  margin-top: 0.15rem;
+}
+
+.item-arrow {
+  font-family: 'Courier Prime', monospace;
+  font-size: 0.9rem;
+  color: var(--card-border);
+  transition: all 0.3s;
+  flex-shrink: 0;
+}
+
+.work-item:hover .item-arrow {
+  color: var(--warm);
+  transform: translateX(3px);
+}
+
+/* DIVIDER */
+.divider {
+  max-width: 1000px;
+  margin: 0 auto;
+  padding: 0 2rem;
+}
+
+.divider-inner {
+  border: none;
+  border-top: 1px solid var(--card-border);
+  position: relative;
+}
+
+.divider-inner::after {
+  content: '✦';
+  position: absolute;
+  top: -0.5em;
+  left: 50%;
+  transform: translateX(-50%);
+  background: var(--bg);
+  padding: 0 1rem;
+  color: var(--warm);
+  font-size: 0.65rem;
+}
+
+/* VIDEO GRID */
+.video-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+  gap: 1.5rem;
+}
+
+.video-card {
+  background: var(--card-bg);
+  border: 1px solid var(--card-border);
+  overflow: hidden;
+  transition: border-color 0.3s;
+}
+
+.video-card:hover { border-color: var(--warm); }
+
+.video-wrapper {
+  position: relative;
+  padding-top: 56.25%; /* 16:9 */
+  background: #000;
+}
+
+.video-wrapper video,
+.video-wrapper iframe {
+  position: absolute;
+  top: 0; left: 0;
+  width: 100%; height: 100%;
+  border: none;
+}
+
+.video-info {
+  padding: 1.2rem;
+}
+
+.video-info .item-title {
+  font-size: 1rem;
+  margin-bottom: 0.3rem;
+}
+
+.video-info .item-tags {
+  margin-bottom: 0.5rem;
+}
+
+.video-info .item-desc {
+  width: auto;
+  margin-top: 0;
+}
+
+/* COMING SOON */
+.coming-soon {
+  border: 1px dashed var(--card-border);
+  padding: 3rem 2rem;
+  text-align: center;
+  grid-column: 1 / -1;
+}
+
+.coming-soon-text {
+  font-family: 'Barlow Condensed', sans-serif;
+  font-weight: 600;
+  font-size: 0.75rem;
+  letter-spacing: 0.3em;
+  color: var(--muted);
+  text-transform: uppercase;
+}
+
+/* FOOTER */
+footer {
+  border-top: 1px solid var(--card-border);
+  padding: 3rem 2rem;
+  text-align: center;
+  margin-top: 2rem;
+  position: relative;
+}
+
+footer::before {
+  content: '✦';
+  position: absolute;
+  top: -0.5em;
+  left: 50%;
+  transform: translateX(-50%);
+  background: var(--bg);
+  padding: 0 1rem;
+  color: var(--warm);
+  font-size: 0.65rem;
+}
+
+.footer-logo {
+  width: 80px;
+  height: auto;
+  margin-bottom: 1.2rem;
+  opacity: 0.35;
+}
+
+footer p {
+  font-family: 'Courier Prime', monospace;
+  font-size: 0.55rem;
+  letter-spacing: 0.25em;
+  color: var(--muted);
+  text-transform: uppercase;
+}
+
+/* RESPONSIVE */
+@media (max-width: 600px) {
+  nav { padding: 0.6rem 1rem; }
+  .nav-logo { height: 26px; }
+  nav .nav-links { gap: 1.5rem; }
+  nav .nav-links a { font-size: 0.65rem; }
+  .filter-bar { padding: 2rem 1rem 0; }
+  .section { padding: 2rem 1rem 3rem; }
+  .work-item {
+    grid-template-columns: 1.8rem 1fr auto;
+    padding: 1rem 1.2rem;
+    gap: 0.8rem;
+  }
+  .item-title { font-size: 1rem; }
+  .item-desc { font-size: 0.7rem; }
+  .video-grid { grid-template-columns: 1fr; }
+  .hero-logo { width: clamp(130px, 45vw, 200px); }
+}
+</style>
+</head>
+<body>
+
+<!-- HERO -->
+<section class="hero">
+  <img src="logo.png" alt="AI STUDIO PAUL TOKYO" class="hero-logo">
+  <div class="hero-line"></div>
+</section>
+
+<!-- NAV -->
+<nav>
+  <img src="logo.png" alt="STUDIO PAUL" class="nav-logo">
+  <ul class="nav-links">
+    <li><a href="#works">Works</a></li>
+    <li><a href="#video">Video</a></li>
+  </ul>
+</nav>
+
+<!-- FILTER -->
+<div class="filter-bar" id="works">
+  <button class="filter-btn active" data-filter="all">All</button>
+  <button class="filter-btn" data-filter="claude">Claude</button>
+  <button class="filter-btn" data-filter="video-ai">Video AI</button>
+</div>
+
+<!-- WORKS -->
+<section class="section">
+  <div class="section-header">
+    <p class="section-label">— Portfolio —</p>
+    <h2 class="section-title">Works</h2>
+    <p class="section-count" id="work-count">10 Projects</p>
+  </div>
+
+  <div class="works-list" id="works-list">
+
+    <a href="https://paul13131313.github.io/g-effector/" target="_blank" rel="noopener" class="work-item" data-ai="claude">
+      <span class="item-num">01</span>
+      <div class="item-main">
+        <span class="item-title">G EFFECTOR</span>
+        <div class="item-tags"><span class="tag">Claude</span><span class="tag type">Web App</span></div>
+        <p class="item-desc">キャラクターボイスシミュレーション。リアルタイムボイスチェンジャー。</p>
+      </div>
+      <span class="item-arrow">→</span>
+    </a>
+
+    <a href="https://paul13131313.github.io/web-theremin/" target="_blank" rel="noopener" class="work-item" data-ai="claude">
+      <span class="item-num">02</span>
+      <div class="item-main">
+        <span class="item-title">Web Theremin</span>
+        <div class="item-tags"><span class="tag">Claude</span><span class="tag type">Web App</span></div>
+        <p class="item-desc">テルミン、ドラム、ピアノなど複数楽器をタッチ操作で演奏するマルチ楽器アプリ。</p>
+      </div>
+      <span class="item-arrow">→</span>
+    </a>
+
+    <a href="https://paul13131313.github.io/touch/" target="_blank" rel="noopener" class="work-item" data-ai="claude">
+      <span class="item-num">03</span>
+      <div class="item-main">
+        <span class="item-title">Touch</span>
+        <div class="item-tags"><span class="tag">Claude</span><span class="tag type">Interactive</span></div>
+        <p class="item-desc">リアルな3Dマテリアルインタラクション。さまざまな素材の触感をウェブで再現。</p>
+      </div>
+      <span class="item-arrow">→</span>
+    </a>
+
+    <a href="https://paul13131313.github.io/goodsounds/" target="_blank" rel="noopener" class="work-item" data-ai="claude">
+      <span class="item-num">04</span>
+      <div class="item-main">
+        <span class="item-title">おならゲップ独奏会</span>
+        <div class="item-tags"><span class="tag">Claude</span><span class="tag type">Sound Game</span></div>
+        <p class="item-desc">サウンドで遊ぶインタラクティブなエンタメ体験。</p>
+      </div>
+      <span class="item-arrow">→</span>
+    </a>
+
+    <a href="https://shelf-drab.vercel.app/login" target="_blank" rel="noopener" class="work-item" data-ai="claude">
+      <span class="item-num">05</span>
+      <div class="item-main">
+        <span class="item-title">My Ranking</span>
+        <div class="item-tags"><span class="tag">Claude</span><span class="tag type">Web App</span></div>
+        <p class="item-desc">映画・音楽・本・ゲームの個人ランキングをドラッグ＆ドロップで管理。</p>
+      </div>
+      <span class="item-arrow">→</span>
+    </a>
+
+    <a href="https://kobutsu.vercel.app/" target="_blank" rel="noopener" class="work-item" data-ai="claude">
+      <span class="item-num">06</span>
+      <div class="item-main">
+        <span class="item-title">ザ・好物</span>
+        <div class="item-tags"><span class="tag">Claude</span><span class="tag type">Web App</span></div>
+        <p class="item-desc">好きな食べ物をランキング形式で並べるフードランキングアプリ。</p>
+      </div>
+      <span class="item-arrow">→</span>
+    </a>
+
+    <a href="https://my5-6s3d.vercel.app/me" target="_blank" rel="noopener" class="work-item" data-ai="claude">
+      <span class="item-num">07</span>
+      <div class="item-main">
+        <span class="item-title">My5</span>
+        <div class="item-tags"><span class="tag">Claude</span><span class="tag type">Web App</span></div>
+        <p class="item-desc">お気に入りBest5を共有するパーソナルランキングページ。</p>
+      </div>
+      <span class="item-arrow">→</span>
+    </a>
+
+    <a href="https://paul1313131313.github.io/weight-tracker/" target="_blank" rel="noopener" class="work-item" data-ai="claude">
+      <span class="item-num">08</span>
+      <div class="item-main">
+        <span class="item-title">Weight</span>
+        <div class="item-tags"><span class="tag">Claude</span><span class="tag type">Web App</span></div>
+        <p class="item-desc">LINE Bot連携の体重トラッカー。チャートで自動可視化。</p>
+      </div>
+      <span class="item-arrow">→</span>
+    </a>
+
+    <a href="https://paul13131313.github.io/condate/" target="_blank" rel="noopener" class="work-item" data-ai="claude">
+      <span class="item-num">09</span>
+      <div class="item-main">
+        <span class="item-title">Condate</span>
+        <div class="item-tags"><span class="tag">Claude</span><span class="tag type">Website</span></div>
+        <p class="item-desc">KILL BILL風デザインの献立提案サイト。</p>
+      </div>
+      <span class="item-arrow">→</span>
+    </a>
+
+    <a href="https://paul13131313.github.io/south-america-2026/" target="_blank" rel="noopener" class="work-item" data-ai="claude">
+      <span class="item-num">10</span>
+      <div class="item-main">
+        <span class="item-title">南米旅行サイト</span>
+        <div class="item-tags"><span class="tag">Claude</span><span class="tag type">Website</span></div>
+        <p class="item-desc">2026年ペルー・ボリビア旅行ガイド。写真と実用情報を掲載。</p>
+      </div>
+      <span class="item-arrow">→</span>
+    </a>
+
+  </div>
+</section>
+
+<!-- DIVIDER -->
+<div class="divider"><hr class="divider-inner"></div>
+
+<!-- VIDEO -->
+<section class="section" id="video">
+  <div class="section-header">
+    <p class="section-label">— Portfolio —</p>
+    <h2 class="section-title">Video</h2>
+    <p class="section-count">Coming Soon</p>
+  </div>
+
+  <div class="video-grid" id="video-grid">
+    <!--
+    ========================================
+    映像作品を追加するテンプレート:
+
+    ■ MP4ファイルの場合（videoフォルダに入れる）:
+    <div class="video-card" data-ai="sora">
+      <div class="video-wrapper">
+        <video controls preload="metadata" poster="video/thumbnail.jpg">
+          <source src="video/filename.mp4" type="video/mp4">
+        </video>
+      </div>
+      <div class="video-info">
+        <div class="item-tags"><span class="tag">Sora</span><span class="tag type">Short Film</span></div>
+        <span class="item-title">作品タイトル</span>
+        <p class="item-desc">作品の説明文。</p>
+      </div>
+    </div>
+
+    ■ YouTube埋め込みの場合:
+    <div class="video-card" data-ai="runway">
+      <div class="video-wrapper">
+        <iframe src="https://www.youtube.com/embed/VIDEO_ID" allowfullscreen loading="lazy"></iframe>
+      </div>
+      <div class="video-info">
+        <div class="item-tags"><span class="tag">Runway</span><span class="tag type">Music Video</span></div>
+        <span class="item-title">作品タイトル</span>
+        <p class="item-desc">作品の説明文。</p>
+      </div>
+    </div>
+
+    ■ Vimeo埋め込みの場合:
+    <div class="video-card" data-ai="kling">
+      <div class="video-wrapper">
+        <iframe src="https://player.vimeo.com/video/VIDEO_ID" allowfullscreen loading="lazy"></iframe>
+      </div>
+      <div class="video-info">
+        <div class="item-tags"><span class="tag">Kling</span><span class="tag type">Short Film</span></div>
+        <span class="item-title">作品タイトル</span>
+        <p class="item-desc">作品の説明文。</p>
+      </div>
+    </div>
+    ========================================
+    -->
+    <div class="coming-soon">
+      <p class="coming-soon-text">🎬&ensp;映像作品を準備中です</p>
+    </div>
+  </div>
+</section>
+
+<!-- FOOTER -->
+<footer>
+  <img src="logo.png" alt="STUDIO PAUL" class="footer-logo">
+  <p>All works created with AI — © 2025 AI Studio Paul Tokyo</p>
+</footer>
+
+<script>
+// Filter
+const filterBtns = document.querySelectorAll('.filter-btn');
+const workItems = document.querySelectorAll('.work-item');
+const videoCards = document.querySelectorAll('.video-card');
+const workCount = document.getElementById('work-count');
+
+filterBtns.forEach(btn => {
+  btn.addEventListener('click', () => {
+    filterBtns.forEach(b => b.classList.remove('active'));
+    btn.classList.add('active');
+    const filter = btn.dataset.filter;
+    let count = 0;
+
+    workItems.forEach(item => {
+      if (filter === 'all' || item.dataset.ai === filter) {
+        item.classList.remove('hidden');
+        count++;
+      } else {
+        item.classList.add('hidden');
+      }
+    });
+
+    videoCards.forEach(card => {
+      if (filter === 'all' || card.dataset.ai === filter) {
+        card.classList.remove('hidden');
+      } else {
+        card.classList.add('hidden');
+      }
+    });
+
+    workCount.textContent = count + ' Project' + (count !== 1 ? 's' : '');
+  });
+});
+
+// Scroll reveal for work items
+const observer = new IntersectionObserver((entries) => {
+  entries.forEach(entry => {
+    if (entry.isIntersecting) {
+      entry.target.style.opacity = '1';
+      entry.target.style.transform = 'translateY(0)';
+      observer.unobserve(entry.target);
+    }
+  });
+}, { threshold: 0.05 });
+
+workItems.forEach((item, i) => {
+  item.style.opacity = '0';
+  item.style.transform = 'translateY(12px)';
+  item.style.transition = `opacity 0.5s ${i * 0.06}s, transform 0.5s ${i * 0.06}s`;
+  observer.observe(item);
+});
+</script>
+
+</body>
+</html>
