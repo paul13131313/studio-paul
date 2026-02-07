@@ -5,7 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>AI STUDIO PAUL — TOKYO</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700&family=Courier+Prime&family=Noto+Sans+JP:wght@300&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700&family=Courier+Prime&family=Noto+Sans+JP:wght@300;700&family=Orbitron:wght@700&display=swap" rel="stylesheet">
   <style>
     * { margin: 0; padding: 0; box-sizing: border-box; }
 
@@ -43,62 +43,54 @@
 
     .panel {
       position: relative;
-      aspect-ratio: 16 / 7;
+      aspect-ratio: 4 / 3;
       overflow: hidden;
       cursor: pointer;
       text-decoration: none;
       color: inherit;
-      display: block;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      text-align: center;
+      transition: transform 0.3s, filter 0.3s;
     }
 
-    .panel-thumb {
-      position: absolute;
-      inset: 0;
-      background-size: cover;
-      background-position: top center;
-      background-color: #1a1917;
-      transition: transform 0.6s cubic-bezier(0.25, 0.1, 0.25, 1);
+    .panel:hover {
+      filter: brightness(1.1);
     }
 
-    .panel:hover .panel-thumb {
-      transform: scale(1.05);
+    .panel-emoji {
+      font-size: clamp(2rem, 4vw, 3.5rem);
+      margin-bottom: 0.6rem;
+      line-height: 1;
     }
 
-    .panel-overlay {
-      position: absolute;
-      inset: 0;
-      background: linear-gradient(
-        0deg,
-        rgba(0,0,0,0.7) 0%,
-        rgba(0,0,0,0.1) 40%,
-        rgba(0,0,0,0) 100%
-      );
-      transition: background 0.4s;
-    }
-
-    .panel:hover .panel-overlay {
-      background: linear-gradient(
-        0deg,
-        rgba(0,0,0,0.85) 0%,
-        rgba(0,0,0,0.2) 50%,
-        rgba(0,0,0,0.05) 100%
-      );
-    }
-
-    .panel-title {
-      position: absolute;
-      bottom: 0.9rem;
-      left: 1rem;
-      font-family: 'Playfair Display', serif;
-      font-size: clamp(0.8rem, 1.3vw, 1.1rem);
-      color: #f5edd6;
-      z-index: 2;
-      transition: color 0.3s;
+    .panel-label {
+      font-family: 'Noto Sans JP', sans-serif;
+      font-weight: 700;
+      font-size: clamp(1rem, 2.2vw, 1.8rem);
       line-height: 1.2;
+      padding: 0 1rem;
+      letter-spacing: 0.02em;
     }
 
-    .panel:hover .panel-title {
-      color: #d4a853;
+    .panel-label-en {
+      font-family: 'Orbitron', 'Playfair Display', serif;
+      font-weight: 700;
+      font-size: clamp(1rem, 2.5vw, 2rem);
+      line-height: 1.1;
+      letter-spacing: 0.05em;
+      text-transform: uppercase;
+      padding: 0 1rem;
+    }
+
+    .panel-sub {
+      font-size: clamp(0.55rem, 0.9vw, 0.75rem);
+      margin-top: 0.4rem;
+      opacity: 0.7;
+      padding: 0 1rem;
+      font-weight: 300;
     }
 
     .loading {
@@ -142,10 +134,87 @@
     <div class="loading">Loading...</div>
   </div>
 
-  <footer>© 2025 AI Studio Paul Tokyo</footer>
+  <footer>&copy; 2025 AI Studio Paul Tokyo</footer>
 
   <script>
     const SHEET_CSV = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vTK9SAFKJrv3hyi6mulfb3HAaiAYmu0dKx8MOw5gwX4LJtOanKVMoti5DoDVRwix3DHsKX9KqsBF9si/pub?output=csv';
+
+    // 各サイトのビジュアル定義
+    const CARD_STYLES = {
+      'MYPAY': {
+        bg: 'linear-gradient(135deg, #0a0a1a 0%, #1a1a3a 100%)',
+        color: '#00e676',
+        emoji: '💳',
+        labelClass: 'panel-label-en'
+      },
+      '投票シミュレーション': {
+        bg: 'linear-gradient(135deg, #f7f3ed 0%, #ece5d8 100%)',
+        color: '#1e50a2',
+        emoji: '🗳️',
+        labelClass: 'panel-label'
+      },
+      'G EFFECTOR': {
+        bg: 'linear-gradient(135deg, #0a0a0a 0%, #1a0a0a 100%)',
+        color: '#ff2d2d',
+        emoji: '🎧',
+        labelClass: 'panel-label-en'
+      },
+      'Web Theremin': {
+        bg: 'linear-gradient(135deg, #000000 0%, #1a0505 100%)',
+        color: '#ff4444',
+        emoji: '🎵',
+        labelClass: 'panel-label-en'
+      },
+      'Touch': {
+        bg: 'linear-gradient(135deg, #050505 0%, #1a1815 100%)',
+        color: '#e8e4df',
+        emoji: '👆',
+        labelClass: 'panel-label-en'
+      },
+      'おならゲップ独奏会': {
+        bg: 'linear-gradient(135deg, #050810 0%, #0a1020 100%)',
+        color: '#00e5ff',
+        emoji: '💨',
+        labelClass: 'panel-label'
+      },
+      'My Ranking': {
+        bg: 'linear-gradient(135deg, #1a1a2e 0%, #16213e 100%)',
+        color: '#f0c040',
+        emoji: '🏆',
+        labelClass: 'panel-label-en'
+      },
+      'ザ・好物': {
+        bg: 'linear-gradient(135deg, #fff4d6 0%, #ffe0a0 100%)',
+        color: '#d35400',
+        emoji: '🍛',
+        labelClass: 'panel-label'
+      },
+      '体重': {
+        bg: 'linear-gradient(135deg, #e8b930 0%, #d4a020 100%)',
+        color: '#c0392b',
+        emoji: '⚖️',
+        labelClass: 'panel-label'
+      },
+      'Condate': {
+        bg: 'linear-gradient(135deg, #FFEB00 0%, #FFD600 100%)',
+        color: '#FF0000',
+        emoji: '🍽️',
+        labelClass: 'panel-label-en'
+      },
+      '南米旅行サイト': {
+        bg: 'linear-gradient(135deg, #2c3e50 0%, #1a252f 100%)',
+        color: '#f5f5f5',
+        emoji: '🏔️',
+        labelClass: 'panel-label'
+      }
+    };
+
+    const DEFAULT_STYLE = {
+      bg: 'linear-gradient(135deg, #2a2a2a 0%, #1a1a1a 100%)',
+      color: '#e8e0d0',
+      emoji: '🔗',
+      labelClass: 'panel-label'
+    };
 
     function parseCSV(text) {
       const lines = text.split('\n').filter(l => l.trim());
@@ -170,24 +239,21 @@
       return rows;
     }
 
-    function thumbUrl(item) {
-      // 4列目にサムネURLがあればそれを使う、なければ自動スクリーンショット
-      if (item.thumb) return item.thumb;
-      return 'https://image.thum.io/get/width/600/crop/300/wait/3/noanimate/' + item.url;
-    }
-
     fetch(SHEET_CSV)
       .then(r => r.text())
       .then(text => {
         const items = parseCSV(text);
         const grid = document.getElementById('grid');
-        grid.innerHTML = items.map(item => `
-          <a href="${item.url}" target="_blank" rel="noopener" class="panel">
-            <div class="panel-thumb" style="background-image:url('${thumbUrl(item)}')"></div>
-            <div class="panel-overlay"></div>
-            <div class="panel-title">${item.title}</div>
+        grid.innerHTML = items.map(item => {
+          const s = CARD_STYLES[item.title] || DEFAULT_STYLE;
+          return `
+          <a href="${item.url}" target="_blank" rel="noopener" class="panel"
+             style="background:${s.bg};">
+            <div class="panel-emoji">${s.emoji}</div>
+            <div class="${s.labelClass}" style="color:${s.color}">${item.title}</div>
+            <div class="panel-sub" style="color:${s.color}">${item.desc}</div>
           </a>
-        `).join('');
+        `}).join('');
       })
       .catch(() => {
         document.getElementById('grid').innerHTML = '<div class="loading">Failed to load</div>';
