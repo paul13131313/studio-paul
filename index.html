@@ -173,7 +173,7 @@
     function thumbUrl(item) {
       // 4列目にサムネURLがあればそれを使う、なければ自動スクリーンショット
       if (item.thumb) return item.thumb;
-      return 'https://image.thum.io/get/width/800/crop/600/' + item.url;
+      return 'https://image.thum.io/get/width/1280/crop/960/wait/3/noanimate/' + item.url;
     }
 
     fetch(SHEET_CSV)
