@@ -1,50 +1,197 @@
 <!DOCTYPE html>
 <html lang="ja">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>気分カード</title>
-<style>
-  * { margin: 0; padding: 0; box-sizing: border-box; }
-  body {
-    min-height: 100vh;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    background: #f0f4f8;
-    font-family: -apple-system, BlinkMacSystemFont, "Hiragino Sans", sans-serif;
-  }
-  .card {
-    width: 320px;
-    padding: 48px 32px;
-    border-radius: 20px;
-    background: linear-gradient(135deg, #667eea, #264de4, #0652DD);
-    color: #fff;
-    text-align: center;
-    box-shadow: 0 20px 40px rgba(38, 77, 228, 0.3);
-  }
-  .emoji {
-    font-size: 72px;
-    line-height: 1;
-    margin-bottom: 20px;
-  }
-  .mood {
-    font-size: 22px;
-    font-weight: 600;
-    letter-spacing: 0.05em;
-    margin-bottom: 12px;
-  }
-  .date {
-    font-size: 14px;
-    opacity: 0.8;
-  }
-</style>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>AI STUDIO PAUL — TOKYO</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700&family=Courier+Prime&family=Noto+Sans+JP:wght@300&display=swap" rel="stylesheet">
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+
+    body {
+      background: #111;
+      color: #e8e0d0;
+      font-family: 'Noto Sans JP', sans-serif;
+      font-weight: 300;
+    }
+
+    body::before {
+      content: '';
+      position: fixed;
+      top: 0; left: 0;
+      width: 100%; height: 100%;
+      background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.03'/%3E%3C/svg%3E");
+      pointer-events: none;
+      z-index: 9999;
+    }
+
+    .header {
+      text-align: center;
+      padding: 2.5rem 2rem 2rem;
+    }
+
+    .logo {
+      width: clamp(80px, 14vw, 110px);
+    }
+
+    .grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      width: 100%;
+    }
+
+    .panel {
+      position: relative;
+      aspect-ratio: 4 / 3;
+      overflow: hidden;
+      cursor: pointer;
+      text-decoration: none;
+      color: inherit;
+      display: block;
+    }
+
+    .panel-thumb {
+      position: absolute;
+      inset: 0;
+      background-size: cover;
+      background-position: top center;
+      background-color: #1a1917;
+      transition: transform 0.6s cubic-bezier(0.25, 0.1, 0.25, 1);
+    }
+
+    .panel:hover .panel-thumb {
+      transform: scale(1.05);
+    }
+
+    .panel-overlay {
+      position: absolute;
+      inset: 0;
+      background: linear-gradient(
+        0deg,
+        rgba(0,0,0,0.7) 0%,
+        rgba(0,0,0,0.1) 40%,
+        rgba(0,0,0,0) 100%
+      );
+      transition: background 0.4s;
+    }
+
+    .panel:hover .panel-overlay {
+      background: linear-gradient(
+        0deg,
+        rgba(0,0,0,0.85) 0%,
+        rgba(0,0,0,0.2) 50%,
+        rgba(0,0,0,0.05) 100%
+      );
+    }
+
+    .panel-title {
+      position: absolute;
+      bottom: 0.9rem;
+      left: 1rem;
+      font-family: 'Playfair Display', serif;
+      font-size: clamp(0.8rem, 1.3vw, 1.1rem);
+      color: #f5edd6;
+      z-index: 2;
+      transition: color 0.3s;
+      line-height: 1.2;
+    }
+
+    .panel:hover .panel-title {
+      color: #d4a853;
+    }
+
+    .loading {
+      grid-column: 1 / -1;
+      text-align: center;
+      padding: 5rem;
+      font-family: 'Courier Prime', monospace;
+      font-size: 0.7rem;
+      letter-spacing: 0.2em;
+      color: #6b6256;
+    }
+
+    footer {
+      text-align: center;
+      padding: 2.5rem 2rem 2rem;
+      font-family: 'Courier Prime', monospace;
+      font-size: 0.55rem;
+      letter-spacing: 0.2em;
+      color: #6b6256;
+      text-transform: uppercase;
+    }
+
+    @media (max-width: 900px) {
+      .grid { grid-template-columns: repeat(2, 1fr); }
+    }
+
+    @media (max-width: 500px) {
+      .grid { grid-template-columns: 1fr; }
+      .panel { aspect-ratio: 16 / 10; }
+      .header { padding: 2rem 1rem 1.5rem; }
+    }
+  </style>
 </head>
 <body>
-  <div class="card">
-    <div class="emoji">🥶</div>
-    <div class="mood">足先がさむい</div>
-    <div class="date">2025-02-07</div>
+
+  <div class="header">
+    <img src="logo.png" alt="AI STUDIO PAUL TOKYO" class="logo">
   </div>
+
+  <div class="grid" id="grid">
+    <div class="loading">Loading...</div>
+  </div>
+
+  <footer>© 2025 AI Studio Paul Tokyo</footer>
+
+  <script>
+    const SHEET_CSV = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vTK9SAFKJrv3hyi6mulfb3HAaiAYmu0dKx8MOw5gwX4LJtOanKVMoti5DoDVRwix3DHsKX9KqsBF9si/pub?output=csv';
+
+    function parseCSV(text) {
+      const lines = text.split('\n').filter(l => l.trim());
+      const rows = [];
+      for (let i = 1; i < lines.length; i++) {
+        const cols = [];
+        let current = '';
+        let inQuotes = false;
+        for (const ch of lines[i]) {
+          if (ch === '"') { inQuotes = !inQuotes; }
+          else if (ch === ',' && !inQuotes) { cols.push(current.trim()); current = ''; }
+          else { current += ch; }
+        }
+        cols.push(current.trim());
+        if (cols[0]) rows.push({
+          title: cols[0],
+          url: cols[1] || '',
+          desc: cols[2] || '',
+          thumb: cols[3] || ''
+        });
+      }
+      return rows;
+    }
+
+    function thumbUrl(item) {
+      // 4列目にサムネURLがあればそれを使う、なければ自動スクリーンショット
+      if (item.thumb) return item.thumb;
+      return 'https://image.thum.io/get/width/800/crop/600/' + item.url;
+    }
+
+    fetch(SHEET_CSV)
+      .then(r => r.text())
+      .then(text => {
+        const items = parseCSV(text);
+        const grid = document.getElementById('grid');
+        grid.innerHTML = items.map(item => `
+          <a href="${item.url}" target="_blank" rel="noopener" class="panel">
+            <div class="panel-thumb" style="background-image:url('${thumbUrl(item)}')"></div>
+            <div class="panel-overlay"></div>
+            <div class="panel-title">${item.title}</div>
+          </a>
+        `).join('');
+      })
+      .catch(() => {
+        document.getElementById('grid').innerHTML = '<div class="loading">Failed to load</div>';
+      });
+  </script>
 </body>
 </html>
