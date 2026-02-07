@@ -89,31 +89,13 @@ body::before {
   transform: translateX(3px);
 }
 
-/* video */
-.video-wrapper {
-  position: relative;
-  padding-top: 56.25%;
-  background: #000;
-}
-
-.video-wrapper video,
-.video-wrapper iframe {
-  position: absolute;
-  top: 0; left: 0;
-  width: 100%; height: 100%;
-  border: none;
-}
-
-.video-item {
-  background: #161413;
-  border: 1px solid #2a2520;
-  overflow: hidden;
-  text-decoration: none;
-  color: inherit;
-}
-
-.video-item .item-info {
-  padding: 1.1rem 1.4rem;
+.loading {
+  text-align: center;
+  padding: 3rem;
+  font-family: 'Courier Prime', monospace;
+  font-size: 0.7rem;
+  letter-spacing: 0.2em;
+  color: #6b6256;
 }
 
 footer {
@@ -137,109 +119,53 @@ footer {
 
 <div class="page">
   <img src="logo.png" alt="AI STUDIO PAUL TOKYO" class="logo">
-
-  <div class="list">
-
-    <a href="https://paul13131313.github.io/g-effector/" target="_blank" rel="noopener" class="item">
-      <div>
-        <div class="item-title">G EFFECTOR</div>
-        <p class="item-desc">キャラクターボイスシミュレーション。リアルタイムボイスチェンジャー。</p>
-      </div>
-      <span class="item-arrow">→</span>
-    </a>
-
-    <a href="https://paul13131313.github.io/web-theremin/" target="_blank" rel="noopener" class="item">
-      <div>
-        <div class="item-title">Web Theremin</div>
-        <p class="item-desc">テルミン、ドラム、ピアノなど複数楽器をタッチ操作で演奏するマルチ楽器アプリ。</p>
-      </div>
-      <span class="item-arrow">→</span>
-    </a>
-
-    <a href="https://paul13131313.github.io/touch/" target="_blank" rel="noopener" class="item">
-      <div>
-        <div class="item-title">Touch</div>
-        <p class="item-desc">リアルな3Dマテリアルインタラクション。さまざまな素材の触感をウェブで再現。</p>
-      </div>
-      <span class="item-arrow">→</span>
-    </a>
-
-    <a href="https://paul13131313.github.io/goodsounds/" target="_blank" rel="noopener" class="item">
-      <div>
-        <div class="item-title">おならゲップ独奏会</div>
-        <p class="item-desc">サウンドで遊ぶインタラクティブなエンタメ体験。</p>
-      </div>
-      <span class="item-arrow">→</span>
-    </a>
-
-    <a href="https://shelf-drab.vercel.app/login" target="_blank" rel="noopener" class="item">
-      <div>
-        <div class="item-title">My Ranking</div>
-        <p class="item-desc">映画・音楽・本・ゲームの個人ランキングをドラッグ＆ドロップで管理。</p>
-      </div>
-      <span class="item-arrow">→</span>
-    </a>
-
-    <a href="https://kobutsu.vercel.app/" target="_blank" rel="noopener" class="item">
-      <div>
-        <div class="item-title">ザ・好物</div>
-        <p class="item-desc">好きな食べ物をランキング形式で並べるフードランキングアプリ。</p>
-      </div>
-      <span class="item-arrow">→</span>
-    </a>
-
-    <a href="https://paul13131313.github.io/weight-tracker/" target="_blank" rel="noopener" class="item">
-      <div>
-        <div class="item-title">体重</div>
-        <p class="item-desc">LINE Bot連携の体重トラッカー。チャートで自動可視化。</p>
-      </div>
-      <span class="item-arrow">→</span>
-    </a>
-
-    <a href="https://paul13131313.github.io/condate/" target="_blank" rel="noopener" class="item">
-      <div>
-        <div class="item-title">Condate</div>
-        <p class="item-desc">KILL BILL風デザインの献立提案サイト。</p>
-      </div>
-      <span class="item-arrow">→</span>
-    </a>
-
-    <a href="https://paul13131313.github.io/south-america-2026/" target="_blank" rel="noopener" class="item">
-      <div>
-        <div class="item-title">南米旅行サイト</div>
-        <p class="item-desc">2026年ペルー・ボリビア旅行ガイド。写真と実用情報を掲載。</p>
-      </div>
-      <span class="item-arrow">→</span>
-    </a>
-
-    <!--
-    映像作品テンプレート（MP4 / YouTube / Vimeo）:
-
-    <div class="video-item">
-      <div class="video-wrapper">
-        <video controls preload="metadata"><source src="video/file.mp4" type="video/mp4"></video>
-      </div>
-      <div class="item-info">
-        <div class="item-title">タイトル</div>
-        <p class="item-desc">説明文</p>
-      </div>
-    </div>
-
-    <div class="video-item">
-      <div class="video-wrapper">
-        <iframe src="https://www.youtube.com/embed/VIDEO_ID" allowfullscreen loading="lazy"></iframe>
-      </div>
-      <div class="item-info">
-        <div class="item-title">タイトル</div>
-        <p class="item-desc">説明文</p>
-      </div>
-    </div>
-    -->
-
+  <div class="list" id="list">
+    <div class="loading">Loading...</div>
   </div>
 </div>
 
 <footer>© 2025 AI Studio Paul Tokyo</footer>
+
+<script>
+const SHEET_CSV = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vTK9SAFKJrv3hyi6mulfb3HAaiAYmu0dKx8MOw5gwX4LJtOanKVMoti5DoDVRwix3DHsKX9KqsBF9si/pub?output=csv';
+
+function parseCSV(text) {
+  const lines = text.split('\n').filter(l => l.trim());
+  const rows = [];
+  for (let i = 1; i < lines.length; i++) {
+    const cols = [];
+    let current = '';
+    let inQuotes = false;
+    for (const ch of lines[i]) {
+      if (ch === '"') { inQuotes = !inQuotes; }
+      else if (ch === ',' && !inQuotes) { cols.push(current.trim()); current = ''; }
+      else { current += ch; }
+    }
+    cols.push(current.trim());
+    if (cols[0]) rows.push({ title: cols[0], url: cols[1] || '', desc: cols[2] || '' });
+  }
+  return rows;
+}
+
+fetch(SHEET_CSV)
+  .then(r => r.text())
+  .then(text => {
+    const items = parseCSV(text);
+    const list = document.getElementById('list');
+    list.innerHTML = items.map(item => `
+      <a href="${item.url}" target="_blank" rel="noopener" class="item">
+        <div>
+          <div class="item-title">${item.title}</div>
+          ${item.desc ? `<p class="item-desc">${item.desc}</p>` : ''}
+        </div>
+        <span class="item-arrow">→</span>
+      </a>
+    `).join('');
+  })
+  .catch(() => {
+    document.getElementById('list').innerHTML = '<div class="loading">Failed to load</div>';
+  });
+</script>
 
 </body>
 </html>
