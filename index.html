@@ -151,83 +151,7 @@
   <script>
     const SHEET_CSV = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vTK9SAFKJrv3hyi6mulfb3HAaiAYmu0dKx8MOw5gwX4LJtOanKVMoti5DoDVRwix3DHsKX9KqsBF9si/pub?output=csv';
 
-    // 各サイトのビジュアル定義
-    const CARD_STYLES = {
-      'MYPAY': {
-        bg: 'linear-gradient(135deg, #0a0a1a 0%, #1a1a3a 100%)',
-        color: '#00e676',
-        emoji: '💳',
-        labelClass: 'panel-label-en'
-      },
-      '投票シミュレーション': {
-        bg: 'linear-gradient(135deg, #f7f3ed 0%, #ece5d8 100%)',
-        color: '#1e50a2',
-        emoji: '🗳️',
-        labelClass: 'panel-label'
-      },
-      'G EFFECTOR': {
-        bg: 'linear-gradient(135deg, #0a0a0a 0%, #1a0a0a 100%)',
-        color: '#ff2d2d',
-        emoji: '🎧',
-        labelClass: 'panel-label-en'
-      },
-      'Web Theremin': {
-        bg: 'linear-gradient(135deg, #000000 0%, #1a0505 100%)',
-        color: '#ff4444',
-        emoji: '🎵',
-        labelClass: 'panel-label-en'
-      },
-      'Touch': {
-        bg: 'linear-gradient(135deg, #050505 0%, #1a1815 100%)',
-        color: '#e8e4df',
-        emoji: '👆',
-        labelClass: 'panel-label-en'
-      },
-      'おならゲップ独奏会': {
-        bg: 'linear-gradient(135deg, #050810 0%, #0a1020 100%)',
-        color: '#00e5ff',
-        emoji: '💨',
-        labelClass: 'panel-label'
-      },
-      'My Ranking': {
-        bg: 'linear-gradient(135deg, #1a1a2e 0%, #16213e 100%)',
-        color: '#f0c040',
-        emoji: '🏆',
-        labelClass: 'panel-label-en'
-      },
-      'ザ・好物': {
-        bg: 'linear-gradient(135deg, #fff4d6 0%, #ffe0a0 100%)',
-        color: '#d35400',
-        emoji: '🍛',
-        labelClass: 'panel-label'
-      },
-      '体重': {
-        bg: 'linear-gradient(135deg, #e8b930 0%, #d4a020 100%)',
-        color: '#c0392b',
-        emoji: '⚖️',
-        labelClass: 'panel-label'
-      },
-      'Condate': {
-        bg: 'linear-gradient(135deg, #FFEB00 0%, #FFD600 100%)',
-        color: '#FF0000',
-        emoji: '🍽️',
-        labelClass: 'panel-label-en'
-      },
-      '南米旅行サイト': {
-        bg: 'linear-gradient(135deg, #2c3e50 0%, #1a252f 100%)',
-        color: '#f5f5f5',
-        emoji: '🏔️',
-        labelClass: 'panel-label'
-      }
-    };
-
-    const DEFAULT_STYLE = {
-      bg: 'linear-gradient(135deg, #2a2a2a 0%, #1a1a1a 100%)',
-      color: '#e8e0d0',
-      emoji: '🔗',
-      labelClass: 'panel-label'
-    };
-
+    // CSVパース: A=タイトル B=URL C=説明 D=サムネ(未使用) E=絵文字 F=背景色 G=文字色 H=フォント(en/ja)
     function parseCSV(text) {
       const lines = text.split('\n').filter(l => l.trim());
       const rows = [];
@@ -243,9 +167,13 @@
         cols.push(current.trim());
         if (cols[0]) rows.push({
           title: cols[0],
-          url: cols[1] || '',
-          desc: cols[2] || '',
-          thumb: cols[3] || ''
+          url:   cols[1] || '',
+          desc:  cols[2] || '',
+          thumb: cols[3] || '',
+          emoji: cols[4] || '🔗',
+          bg:    cols[5] || 'linear-gradient(135deg, #2a2a2a 0%, #1a1a1a 100%)',
+          color: cols[6] || '#e8e0d0',
+          font:  cols[7] || 'ja'
         });
       }
       return rows;
@@ -257,13 +185,13 @@
         const items = parseCSV(text);
         const grid = document.getElementById('grid');
         grid.innerHTML = items.map(item => {
-          const s = CARD_STYLES[item.title] || DEFAULT_STYLE;
+          const labelClass = item.font === 'en' ? 'panel-label-en' : 'panel-label';
           return `
           <a href="${item.url}" target="_blank" rel="noopener" class="panel"
-             style="background:${s.bg};">
-            <div class="panel-emoji">${s.emoji}</div>
-            <div class="${s.labelClass}" style="color:${s.color}">${item.title}</div>
-            <div class="panel-sub" style="color:${s.color}">${item.desc}</div>
+             style="background:${item.bg};">
+            <div class="panel-emoji">${item.emoji}</div>
+            <div class="${labelClass}" style="color:${item.color}">${item.title}</div>
+            <div class="panel-sub" style="color:${item.color}">${item.desc}</div>
           </a>
         `}).join('');
       })
