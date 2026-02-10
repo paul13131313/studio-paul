@@ -125,14 +125,189 @@
       text-transform: uppercase;
     }
 
+    /* MY RANKING */
+    .ranking-section {
+      padding: 3rem 2rem 1rem;
+    }
+
+    .ranking-title {
+      font-family: 'Orbitron', monospace;
+      font-weight: 700;
+      font-size: clamp(0.7rem, 1.2vw, 0.9rem);
+      letter-spacing: 0.25em;
+      color: #6b6256;
+      text-transform: uppercase;
+      text-align: center;
+      margin-bottom: 2rem;
+    }
+
+    .ranking-grid {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 1px;
+      background: #1a1a1a;
+    }
+
+    .ranking-card {
+      background: #181818;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      padding: 2rem 1rem;
+      cursor: pointer;
+      transition: background 0.3s, filter 0.3s;
+      text-align: center;
+      aspect-ratio: 4 / 3;
+    }
+
+    .ranking-card:hover {
+      background: #222;
+      filter: brightness(1.15);
+    }
+
+    .ranking-card-icon {
+      font-size: clamp(1.8rem, 3.5vw, 3rem);
+      margin-bottom: 0.6rem;
+      line-height: 1;
+    }
+
+    .ranking-card-name {
+      font-family: 'Noto Sans JP', sans-serif;
+      font-weight: 700;
+      font-size: clamp(0.7rem, 1.4vw, 1.1rem);
+      color: #e8e0d0;
+      letter-spacing: 0.04em;
+    }
+
+    /* Modal overlay */
+    .ranking-overlay {
+      position: fixed;
+      top: 0; left: 0;
+      width: 100%; height: 100%;
+      background: rgba(0, 0, 0, 0.85);
+      z-index: 5000;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      opacity: 0;
+      visibility: hidden;
+      transition: opacity 0.35s, visibility 0.35s;
+    }
+
+    .ranking-overlay.active {
+      opacity: 1;
+      visibility: visible;
+    }
+
+    .ranking-modal {
+      background: #181818;
+      border: 1px solid #2a2a2a;
+      width: 90%;
+      max-width: 480px;
+      max-height: 80vh;
+      overflow-y: auto;
+      transform: translateY(30px);
+      transition: transform 0.35s;
+      position: relative;
+    }
+
+    .ranking-overlay.active .ranking-modal {
+      transform: translateY(0);
+    }
+
+    .ranking-modal-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 1.5rem 1.8rem;
+      border-bottom: 1px solid #2a2a2a;
+    }
+
+    .ranking-modal-title {
+      font-family: 'Noto Sans JP', sans-serif;
+      font-weight: 700;
+      font-size: clamp(1rem, 2vw, 1.4rem);
+      color: #e8e0d0;
+    }
+
+    .ranking-modal-title span {
+      margin-right: 0.5rem;
+    }
+
+    .ranking-modal-close {
+      background: none;
+      border: none;
+      color: #6b6256;
+      font-size: 1.4rem;
+      cursor: pointer;
+      padding: 0.2rem;
+      line-height: 1;
+      transition: color 0.2s;
+    }
+
+    .ranking-modal-close:hover {
+      color: #e8e0d0;
+    }
+
+    .ranking-list {
+      list-style: none;
+      padding: 0.5rem 0;
+    }
+
+    .ranking-item {
+      display: flex;
+      align-items: center;
+      padding: 0.9rem 1.8rem;
+      gap: 1rem;
+      transition: background 0.2s;
+    }
+
+    .ranking-item:hover {
+      background: #1f1f1f;
+    }
+
+    .ranking-num {
+      font-family: 'Orbitron', monospace;
+      font-weight: 700;
+      font-size: clamp(0.85rem, 1.5vw, 1.1rem);
+      color: #6b6256;
+      min-width: 2rem;
+      text-align: right;
+    }
+
+    .ranking-item:nth-child(1) .ranking-num { color: #c9a84c; }
+    .ranking-item:nth-child(2) .ranking-num { color: #8a8a8a; }
+    .ranking-item:nth-child(3) .ranking-num { color: #9a6e3a; }
+
+    .ranking-item-title {
+      font-family: 'Noto Sans JP', sans-serif;
+      font-weight: 300;
+      font-size: clamp(0.8rem, 1.4vw, 1rem);
+      color: #e8e0d0;
+    }
+
+    .ranking-loading {
+      text-align: center;
+      padding: 3rem;
+      font-family: 'Courier Prime', monospace;
+      font-size: 0.7rem;
+      letter-spacing: 0.2em;
+      color: #6b6256;
+    }
+
     @media (max-width: 900px) {
       .grid { grid-template-columns: repeat(2, 1fr); }
+      .ranking-grid { grid-template-columns: repeat(3, 1fr); }
     }
 
     @media (max-width: 500px) {
       .grid { grid-template-columns: 1fr; }
       .panel { aspect-ratio: 16 / 10; }
       .header { padding: 2rem 1rem 1.5rem; }
+      .ranking-grid { grid-template-columns: repeat(2, 1fr); }
+      .ranking-card { aspect-ratio: 3 / 2; }
+      .ranking-section { padding: 2rem 0 1rem; }
     }
   </style>
 </head>
@@ -144,6 +319,23 @@
 
   <div class="grid" id="grid">
     <div class="loading">Loading...</div>
+  </div>
+
+  <div class="ranking-section">
+    <div class="ranking-title">My Ranking</div>
+    <div class="ranking-grid" id="ranking-grid">
+      <div class="ranking-loading">Loading...</div>
+    </div>
+  </div>
+
+  <div class="ranking-overlay" id="ranking-overlay">
+    <div class="ranking-modal">
+      <div class="ranking-modal-header">
+        <div class="ranking-modal-title" id="ranking-modal-title"></div>
+        <button class="ranking-modal-close" id="ranking-close">&times;</button>
+      </div>
+      <ul class="ranking-list" id="ranking-list"></ul>
+    </div>
   </div>
 
   <footer>&copy; 2025 AI Studio Paul Tokyo</footer>
@@ -198,6 +390,66 @@
       .catch(() => {
         document.getElementById('grid').innerHTML = '<div class="loading">Failed to load</div>';
       });
+
+    // MY RANKING
+    const RANKING_API = 'https://my-ranking-api.hiroshinagano0113.workers.dev';
+
+    fetch(`${RANKING_API}/rankings`)
+      .then(r => r.json())
+      .then(categories => {
+        const grid = document.getElementById('ranking-grid');
+        grid.innerHTML = categories.map(c => `
+          <div class="ranking-card" data-id="${c.id}" data-name="${c.name}" data-icon="${c.icon}">
+            <div class="ranking-card-icon">${c.icon}</div>
+            <div class="ranking-card-name">${c.name}</div>
+          </div>
+        `).join('');
+
+        grid.addEventListener('click', e => {
+          const card = e.target.closest('.ranking-card');
+          if (!card) return;
+          openRanking(card.dataset.id, card.dataset.icon, card.dataset.name);
+        });
+      })
+      .catch(() => {
+        document.getElementById('ranking-grid').innerHTML = '<div class="ranking-loading">Failed to load</div>';
+      });
+
+    function openRanking(id, icon, name) {
+      const overlay = document.getElementById('ranking-overlay');
+      const list = document.getElementById('ranking-list');
+      const title = document.getElementById('ranking-modal-title');
+      title.innerHTML = `<span>${icon}</span>${name}`;
+      list.innerHTML = '<div class="ranking-loading">Loading...</div>';
+      overlay.classList.add('active');
+
+      fetch(`${RANKING_API}/rankings/${id}`)
+        .then(r => r.json())
+        .then(items => {
+          if (!items.length) {
+            list.innerHTML = '<div class="ranking-loading">No items</div>';
+            return;
+          }
+          list.innerHTML = items.map(item => `
+            <li class="ranking-item">
+              <div class="ranking-num">${item.rank}</div>
+              <div class="ranking-item-title">${item.title}</div>
+            </li>
+          `).join('');
+        })
+        .catch(() => {
+          list.innerHTML = '<div class="ranking-loading">Failed to load</div>';
+        });
+    }
+
+    document.getElementById('ranking-close').addEventListener('click', () => {
+      document.getElementById('ranking-overlay').classList.remove('active');
+    });
+    document.getElementById('ranking-overlay').addEventListener('click', e => {
+      if (e.target === e.currentTarget) {
+        e.currentTarget.classList.remove('active');
+      }
+    });
   </script>
 </body>
 </html>
