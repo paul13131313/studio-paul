@@ -17,17 +17,34 @@
   <meta name="twitter:image" content="https://paul13131313.github.io/studio-paul/ogp.png">
 
   <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700&family=Courier+Prime&family=Noto+Sans+JP:wght@300;700&family=Orbitron:wght@700&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Syne:wght@700;800&family=Space+Mono:wght@400;700&family=Noto+Sans+JP:wght@400;700&family=Orbitron:wght@700&display=swap" rel="stylesheet">
   <style>
-    * { margin: 0; padding: 0; box-sizing: border-box; }
+    /* ── Reset & Variables ── */
+    *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
 
-    body {
-      background: #111;
-      color: #e8e0d0;
-      font-family: 'Noto Sans JP', sans-serif;
-      font-weight: 300;
+    :root {
+      --bg-primary: #0a0a0f;
+      --bg-card: rgba(255,255,255,0.03);
+      --text-primary: rgba(255,255,255,0.9);
+      --text-secondary: rgba(255,255,255,0.5);
+      --gold: #c8a96e;
+      --gold-dim: rgba(200, 169, 110, 0.4);
+      --border: rgba(255,255,255,0.06);
+      --gradient-accent: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
     }
 
+    html { scroll-behavior: smooth; }
+
+    body {
+      background: var(--bg-primary);
+      color: var(--text-primary);
+      font-family: 'Noto Sans JP', sans-serif;
+      font-weight: 400;
+      overflow-x: hidden;
+      cursor: none;
+    }
+
+    /* ── Film grain overlay ── */
     body::before {
       content: '';
       position: fixed;
@@ -38,132 +55,422 @@
       z-index: 9999;
     }
 
-    .header {
-      text-align: center;
-      padding: 2.5rem 2rem 2rem;
+    /* ── Custom Cursor (PC only) ── */
+    .custom-cursor {
+      width: 12px;
+      height: 12px;
+      background: rgba(255, 255, 255, 0.8);
+      border-radius: 50%;
+      position: fixed;
+      top: -6px;
+      left: -6px;
+      pointer-events: none;
+      z-index: 10001;
+      transition: width 0.2s ease, height 0.2s ease, top 0.2s ease, left 0.2s ease, background 0.2s ease;
+      mix-blend-mode: difference;
+      will-change: transform;
     }
 
-    .logo {
-      width: clamp(80px, 14vw, 110px);
+    .custom-cursor.hover {
+      width: 40px;
+      height: 40px;
+      top: -20px;
+      left: -20px;
+      background: rgba(255, 255, 255, 0.15);
     }
 
-    .grid {
-      display: grid;
-      grid-template-columns: repeat(3, 1fr);
+    /* ── Scroll Progress Bar ── */
+    .scroll-progress {
+      position: fixed;
+      top: 0;
+      left: 0;
       width: 100%;
+      height: 2px;
+      background: linear-gradient(90deg, #667eea, #764ba2, #f093fb);
+      transform-origin: left;
+      z-index: 10000;
+      transform: scaleX(0);
     }
 
-    .panel {
-      position: relative;
-      aspect-ratio: 4 / 3;
-      overflow: hidden;
-      cursor: pointer;
+    @supports (animation-timeline: scroll()) {
+      .scroll-progress {
+        animation: progress-grow linear;
+        animation-timeline: scroll();
+      }
+    }
+
+    @keyframes progress-grow {
+      from { transform: scaleX(0); }
+      to { transform: scaleX(1); }
+    }
+
+    /* ── Navigation ── */
+    nav {
+      position: fixed;
+      top: 0; left: 0;
+      width: 100%;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      gap: 2.5rem;
+      padding: 1rem 2rem;
+      z-index: 9998;
+      background: transparent;
+      transition: background 0.3s, backdrop-filter 0.3s;
+    }
+
+    nav.scrolled {
+      background: rgba(10, 10, 15, 0.8);
+      backdrop-filter: blur(12px);
+      -webkit-backdrop-filter: blur(12px);
+      border-bottom: 1px solid rgba(255,255,255,0.05);
+    }
+
+    nav a {
+      font-family: 'Space Mono', monospace;
+      font-size: 0.7rem;
+      letter-spacing: 0.2em;
+      text-transform: uppercase;
+      color: var(--text-secondary);
       text-decoration: none;
-      color: inherit;
+      transition: color 0.3s;
+      cursor: none;
+    }
+
+    nav a:hover { color: var(--text-primary); }
+
+    .nav-hamburger {
+      display: none;
+      background: none;
+      border: none;
+      width: 24px;
+      height: 18px;
+      position: fixed;
+      top: 1.2rem;
+      right: 1.2rem;
+      z-index: 9999;
+      cursor: none;
+      flex-direction: column;
+      justify-content: space-between;
+    }
+
+    .nav-hamburger span {
+      display: block;
+      width: 100%;
+      height: 2px;
+      background: var(--text-primary);
+      transition: transform 0.3s, opacity 0.3s;
+    }
+
+    .nav-hamburger.open span:nth-child(1) { transform: translateY(8px) rotate(45deg); }
+    .nav-hamburger.open span:nth-child(2) { opacity: 0; }
+    .nav-hamburger.open span:nth-child(3) { transform: translateY(-8px) rotate(-45deg); }
+
+    /* ── Hero Section ── */
+    #hero {
+      position: relative;
+      height: 100vh;
       display: flex;
       flex-direction: column;
       align-items: center;
       justify-content: center;
       text-align: center;
-      transition: transform 0.3s, filter 0.3s;
+      overflow: hidden;
     }
 
-    .panel:hover {
-      filter: brightness(1.1);
+    #hero-canvas {
+      position: absolute;
+      top: 0; left: 0;
+      width: 100%; height: 100%;
+      z-index: 0;
     }
 
-    .panel-emoji {
-      font-size: clamp(2rem, 4vw, 3.5rem);
-      margin-bottom: 0.6rem;
+    .hero-content {
+      position: relative;
+      z-index: 1;
+    }
+
+    @supports (animation-timeline: scroll()) {
+      .hero-content {
+        animation: hero-exit linear both;
+        animation-timeline: scroll();
+        animation-range: 0% 30vh;
+      }
+    }
+
+    @keyframes hero-exit {
+      from {
+        opacity: 1;
+        transform: translateY(0) scale(1);
+        filter: blur(0px);
+      }
+      to {
+        opacity: 0;
+        transform: translateY(-80px) scale(0.95);
+        filter: blur(6px);
+      }
+    }
+
+    .logo {
+      width: clamp(80px, 14vw, 120px);
+      margin-bottom: 1.5rem;
+      filter: drop-shadow(0 0 30px rgba(200, 169, 110, 0.15));
+    }
+
+    .typing-container {
+      font-family: 'Space Mono', monospace;
+      font-size: clamp(0.7rem, 1.4vw, 1rem);
+      color: var(--gold);
+      letter-spacing: 0.15em;
+      min-height: 1.5em;
+    }
+
+    .typing-cursor {
+      display: inline-block;
+      width: 2px;
+      height: 1em;
+      background: var(--gold);
+      margin-left: 2px;
+      animation: cursor-blink 0.6s infinite alternate;
+      vertical-align: text-bottom;
+    }
+
+    @keyframes cursor-blink {
+      from { opacity: 1; }
+      to { opacity: 0; }
+    }
+
+    .scroll-arrow {
+      position: absolute;
+      bottom: 2rem;
+      left: 50%;
+      transform: translateX(-50%);
+      z-index: 1;
+      animation: arrow-bob 1.5s ease-in-out infinite;
+    }
+
+    .scroll-arrow svg {
+      width: 20px;
+      height: 20px;
+      stroke: var(--text-secondary);
+      fill: none;
+      stroke-width: 2;
+    }
+
+    @keyframes arrow-bob {
+      0%, 100% { transform: translateX(-50%) translateY(0); opacity: 1; }
+      50% { transform: translateX(-50%) translateY(8px); opacity: 0.5; }
+    }
+
+    /* ── Section Titles ── */
+    .section-title {
+      font-family: 'Syne', sans-serif;
+      font-weight: 800;
+      font-size: clamp(2rem, 5vw, 3.5rem);
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      color: var(--text-primary);
+      text-align: center;
+      margin-bottom: 3rem;
+      opacity: 0;
+      transform: translateX(-60px);
+      filter: blur(4px);
+      transition: opacity 0.7s ease, transform 0.7s cubic-bezier(0.16, 1, 0.3, 1), filter 0.7s ease;
+    }
+
+    @supports (animation-timeline: view()) {
+      .section-title {
+        opacity: 1;
+        transform: translateX(0);
+        filter: blur(0);
+        animation: slide-in-left linear both;
+        animation-timeline: view();
+        animation-range: entry 0% entry 60%;
+      }
+    }
+
+    @keyframes slide-in-left {
+      from {
+        opacity: 0;
+        transform: translateX(-60px);
+        filter: blur(4px);
+      }
+      to {
+        opacity: 1;
+        transform: translateX(0);
+        filter: blur(0);
+      }
+    }
+
+    .section-title.revealed {
+      opacity: 1;
+      transform: translateX(0);
+      filter: blur(0);
+    }
+
+    /* ── Works Section ── */
+    #works {
+      padding: 6rem 0 4rem;
+    }
+
+    .works-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 20px;
+      max-width: 1100px;
+      margin: 0 auto;
+      padding: 0 24px;
+    }
+
+    .work-card {
+      position: relative;
+      border-radius: 16px;
+      overflow: hidden;
+      border: 1px solid var(--border);
+      text-decoration: none;
+      color: inherit;
+      display: block;
+      opacity: 0;
+      transition: opacity 0.7s ease, transform 0.7s cubic-bezier(0.16, 1, 0.3, 1), border-color 0.3s;
+      cursor: none;
+    }
+
+    .work-card.from-left { transform: translateX(-50px); }
+    .work-card.from-bottom { transform: translateY(50px); }
+    .work-card.from-right { transform: translateX(50px); }
+
+    .work-card.revealed {
+      opacity: 1;
+      transform: translate(0, 0);
+    }
+
+    .work-card:hover {
+      transform: translateY(-8px) !important;
+      border-color: var(--accent, rgba(255,255,255,0.15));
+    }
+
+    .work-card-bg {
+      position: absolute;
+      top: 0; left: 0;
+      width: 100%; height: 100%;
+      z-index: 0;
+    }
+
+    .work-card-shine {
+      position: absolute;
+      top: 0; left: -100%;
+      width: 100%; height: 100%;
+      background: linear-gradient(90deg, transparent, rgba(255,255,255,0.04), transparent);
+      transition: left 0.6s ease;
+      pointer-events: none;
+      z-index: 1;
+    }
+
+    .work-card:hover .work-card-shine { left: 100%; }
+
+    .work-card-content {
+      position: relative;
+      z-index: 2;
+      padding: 1.8rem 1.5rem;
+      min-height: 160px;
+      display: flex;
+      flex-direction: column;
+    }
+
+    .work-emoji {
+      font-size: 2rem;
+      margin-bottom: 0.8rem;
       line-height: 1;
     }
 
-    .panel-label {
+    .work-title {
       font-family: 'Noto Sans JP', sans-serif;
       font-weight: 700;
-      font-size: clamp(1rem, 2.2vw, 1.8rem);
-      line-height: 1.2;
-      padding: 0 1rem;
-      letter-spacing: 0.02em;
+      font-size: clamp(0.9rem, 1.5vw, 1.15rem);
+      margin-bottom: 0.4rem;
+      line-height: 1.3;
     }
 
-    .panel-label-en {
-      font-family: 'Orbitron', 'Playfair Display', serif;
+    .work-title-en {
+      font-family: 'Orbitron', 'Syne', sans-serif;
       font-weight: 700;
-      font-size: clamp(1rem, 2.5vw, 2rem);
-      line-height: 1.1;
+      font-size: clamp(0.85rem, 1.5vw, 1.1rem);
       letter-spacing: 0.05em;
       text-transform: uppercase;
-      padding: 0 1rem;
+      margin-bottom: 0.4rem;
+      line-height: 1.2;
     }
 
-    .panel-sub {
-      font-size: clamp(0.55rem, 0.9vw, 0.75rem);
-      margin-top: 0.4rem;
+    .work-desc {
+      font-size: 0.75rem;
       opacity: 0.7;
-      padding: 0 1rem;
-      font-weight: 300;
+      line-height: 1.5;
+      flex: 1;
     }
 
-    .loading {
+    .work-arrow {
+      position: absolute;
+      bottom: 16px;
+      right: 16px;
+      opacity: 0;
+      transform: translateX(-8px);
+      transition: opacity 0.3s, transform 0.3s;
+      font-size: 18px;
+      z-index: 2;
+    }
+
+    .work-card:hover .work-arrow {
+      opacity: 1;
+      transform: translateX(0);
+    }
+
+    .works-loading {
       grid-column: 1 / -1;
       text-align: center;
       padding: 5rem;
-      font-family: 'Courier Prime', monospace;
+      font-family: 'Space Mono', monospace;
       font-size: 0.7rem;
       letter-spacing: 0.2em;
-      color: #6b6256;
+      color: var(--text-secondary);
     }
 
-    footer {
-      text-align: center;
-      padding: 2.5rem 2rem 2rem;
-      font-family: 'Courier Prime', monospace;
-      font-size: 0.55rem;
-      letter-spacing: 0.2em;
-      color: #6b6256;
-      text-transform: uppercase;
-    }
-
-    /* MY RANKING */
-    .ranking-section {
-      padding: 3rem 2rem 1rem;
-    }
-
-    .ranking-title {
-      font-family: 'Orbitron', monospace;
-      font-weight: 700;
-      font-size: clamp(0.7rem, 1.2vw, 0.9rem);
-      letter-spacing: 0.25em;
-      color: #6b6256;
-      text-transform: uppercase;
-      text-align: center;
-      margin-bottom: 2rem;
+    /* ── Ranking Section ── */
+    #ranking {
+      padding: 4rem 0 2rem;
     }
 
     .ranking-grid {
       display: grid;
       grid-template-columns: repeat(4, 1fr);
       gap: 1px;
-      background: #1a1a1a;
+      max-width: 1100px;
+      margin: 0 auto;
+      background: rgba(255,255,255,0.02);
     }
 
     .ranking-card {
-      background: #181818;
+      background: rgba(255,255,255,0.02);
       display: flex;
       flex-direction: column;
       align-items: center;
       justify-content: center;
       padding: 2rem 1rem;
-      cursor: pointer;
-      transition: background 0.3s, filter 0.3s;
+      cursor: none;
+      transition: background 0.3s, transform 0.3s;
       text-align: center;
       aspect-ratio: 4 / 3;
+      opacity: 0;
+      transform: translateY(30px);
+    }
+
+    .ranking-card.revealed {
+      opacity: 1;
+      transform: translateY(0);
+      transition: opacity 0.6s ease, transform 0.6s cubic-bezier(0.16, 1, 0.3, 1), background 0.3s;
     }
 
     .ranking-card:hover {
-      background: #222;
-      filter: brightness(1.15);
+      background: rgba(255,255,255,0.06);
     }
 
     .ranking-card-icon {
@@ -176,16 +483,18 @@
       font-family: 'Noto Sans JP', sans-serif;
       font-weight: 700;
       font-size: clamp(0.7rem, 1.4vw, 1.1rem);
-      color: #e8e0d0;
+      color: var(--text-primary);
       letter-spacing: 0.04em;
     }
 
-    /* Modal overlay */
+    /* ── Ranking Modal ── */
     .ranking-overlay {
       position: fixed;
       top: 0; left: 0;
       width: 100%; height: 100%;
-      background: rgba(0, 0, 0, 0.85);
+      background: rgba(0, 0, 0, 0.7);
+      backdrop-filter: blur(16px);
+      -webkit-backdrop-filter: blur(16px);
       z-index: 5000;
       display: flex;
       align-items: center;
@@ -202,18 +511,36 @@
 
     .ranking-modal {
       background: #181818;
-      border: 1px solid #2a2a2a;
+      border: 1px solid rgba(255,255,255,0.08);
+      border-radius: 20px;
       width: 90%;
       max-width: 480px;
       max-height: 80vh;
       overflow-y: auto;
-      transform: translateY(30px);
-      transition: transform 0.35s;
       position: relative;
+      animation: modal-enter 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+
+    .ranking-overlay:not(.active) .ranking-modal {
+      animation: none;
+      transform: translateY(20px) scale(0.95);
+      opacity: 0;
     }
 
     .ranking-overlay.active .ranking-modal {
-      transform: translateY(0);
+      transform: translateY(0) scale(1);
+      opacity: 1;
+    }
+
+    @keyframes modal-enter {
+      from {
+        opacity: 0;
+        transform: translateY(20px) scale(0.95);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0) scale(1);
+      }
     }
 
     .ranking-modal-header {
@@ -221,34 +548,30 @@
       align-items: center;
       justify-content: space-between;
       padding: 1.5rem 1.8rem;
-      border-bottom: 1px solid #2a2a2a;
+      border-bottom: 1px solid rgba(255,255,255,0.06);
     }
 
     .ranking-modal-title {
       font-family: 'Noto Sans JP', sans-serif;
       font-weight: 700;
       font-size: clamp(1rem, 2vw, 1.4rem);
-      color: #e8e0d0;
+      color: var(--text-primary);
     }
 
-    .ranking-modal-title span {
-      margin-right: 0.5rem;
-    }
+    .ranking-modal-title span { margin-right: 0.5rem; }
 
     .ranking-modal-close {
       background: none;
       border: none;
-      color: #6b6256;
+      color: var(--text-secondary);
       font-size: 1.4rem;
-      cursor: pointer;
+      cursor: none;
       padding: 0.2rem;
       line-height: 1;
       transition: color 0.2s;
     }
 
-    .ranking-modal-close:hover {
-      color: #e8e0d0;
-    }
+    .ranking-modal-close:hover { color: var(--text-primary); }
 
     .ranking-list {
       list-style: none;
@@ -263,15 +586,13 @@
       transition: background 0.2s;
     }
 
-    .ranking-item:hover {
-      background: #1f1f1f;
-    }
+    .ranking-item:hover { background: rgba(255,255,255,0.03); }
 
     .ranking-num {
       font-family: 'Orbitron', monospace;
       font-weight: 700;
       font-size: clamp(0.85rem, 1.5vw, 1.1rem);
-      color: #6b6256;
+      color: var(--text-secondary);
       min-width: 2rem;
       text-align: right;
     }
@@ -282,52 +603,169 @@
 
     .ranking-item-title {
       font-family: 'Noto Sans JP', sans-serif;
-      font-weight: 300;
+      font-weight: 400;
       font-size: clamp(0.8rem, 1.4vw, 1rem);
-      color: #e8e0d0;
+      color: var(--text-primary);
     }
 
     .ranking-loading {
       text-align: center;
       padding: 3rem;
-      font-family: 'Courier Prime', monospace;
+      font-family: 'Space Mono', monospace;
       font-size: 0.7rem;
       letter-spacing: 0.2em;
-      color: #6b6256;
+      color: var(--text-secondary);
     }
 
+    /* ── Status Section ── */
+    #status {
+      padding: 4rem 0 2rem;
+    }
+
+    .status-grid {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: center;
+      gap: 1rem;
+      max-width: 900px;
+      margin: 0 auto;
+      padding: 0 24px;
+    }
+
+    .status-item {
+      display: flex;
+      align-items: center;
+      gap: 0.6rem;
+      padding: 0.8rem 1.2rem;
+      background: rgba(255,255,255,0.02);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      font-family: 'Space Mono', monospace;
+      font-size: 0.7rem;
+      letter-spacing: 0.05em;
+      color: var(--text-secondary);
+      opacity: 0;
+      transform: translateY(20px);
+      transition: opacity 0.5s ease, transform 0.5s ease;
+    }
+
+    .status-item.revealed {
+      opacity: 1;
+      transform: translateY(0);
+    }
+
+    .status-dot {
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      background: #555;
+      flex-shrink: 0;
+    }
+
+    .status-dot.up {
+      background: #48c78e;
+      animation: pulse-green 2s ease-in-out infinite;
+    }
+
+    .status-dot.down {
+      background: #f14668;
+    }
+
+    @keyframes pulse-green {
+      0%, 100% { box-shadow: 0 0 0 0 rgba(72, 199, 142, 0.4); }
+      50% { box-shadow: 0 0 0 6px rgba(72, 199, 142, 0); }
+    }
+
+    /* ── Footer ── */
+    footer {
+      text-align: center;
+      padding: 3rem 2rem;
+      font-family: 'Space Mono', monospace;
+      font-size: 0.55rem;
+      letter-spacing: 0.2em;
+      color: var(--text-secondary);
+      text-transform: uppercase;
+    }
+
+    /* ── Responsive ── */
     @media (max-width: 900px) {
-      .grid { grid-template-columns: repeat(2, 1fr); }
+      .works-grid { grid-template-columns: repeat(2, 1fr); }
       .ranking-grid { grid-template-columns: repeat(3, 1fr); }
     }
 
-    @media (max-width: 500px) {
-      .grid { grid-template-columns: 1fr; }
-      .panel { aspect-ratio: 16 / 10; }
-      .header { padding: 2rem 1rem 1.5rem; }
+    @media (max-width: 768px) {
+      nav { display: none; }
+      nav.mobile-open {
+        display: flex;
+        flex-direction: column;
+        gap: 1.5rem;
+        padding: 4rem 2rem 2rem;
+        background: rgba(10, 10, 15, 0.95);
+        backdrop-filter: blur(16px);
+        -webkit-backdrop-filter: blur(16px);
+      }
+      .nav-hamburger { display: flex; }
+      body { cursor: auto; }
+      .custom-cursor { display: none; }
+    }
+
+    @media (max-width: 480px) {
+      .works-grid { grid-template-columns: 1fr; }
       .ranking-grid { grid-template-columns: repeat(2, 1fr); }
       .ranking-card { aspect-ratio: 3 / 2; }
-      .ranking-section { padding: 2rem 0 1rem; }
+      .work-card-content { min-height: 130px; }
     }
   </style>
 </head>
 <body>
 
-  <div class="header">
-    <img src="logo.png" alt="AI STUDIO PAUL TOKYO" class="logo">
-  </div>
+  <!-- Custom Cursor -->
+  <div class="custom-cursor" id="custom-cursor"></div>
 
-  <div class="grid" id="grid">
-    <div class="loading">Loading...</div>
-  </div>
+  <!-- Scroll Progress Bar -->
+  <div class="scroll-progress" id="scroll-progress"></div>
 
-  <div class="ranking-section">
-    <div class="ranking-title">My Ranking</div>
+  <!-- Navigation -->
+  <nav id="nav">
+    <a href="#works">Works</a>
+    <a href="#ranking">Ranking</a>
+    <a href="#status">Status</a>
+  </nav>
+  <button class="nav-hamburger" id="nav-hamburger" aria-label="Menu">
+    <span></span><span></span><span></span>
+  </button>
+
+  <!-- Hero Section -->
+  <section id="hero">
+    <canvas id="hero-canvas"></canvas>
+    <div class="hero-content">
+      <img src="logo.png" alt="AI STUDIO PAUL TOKYO" class="logo">
+      <div class="typing-container">
+        <span id="typing-text"></span><span class="typing-cursor"></span>
+      </div>
+    </div>
+    <div class="scroll-arrow">
+      <svg viewBox="0 0 24 24"><polyline points="6 9 12 15 18 9"/></svg>
+    </div>
+  </section>
+
+  <!-- Works Section -->
+  <section id="works">
+    <h2 class="section-title">Works</h2>
+    <div class="works-grid" id="works-grid">
+      <div class="works-loading">Loading...</div>
+    </div>
+  </section>
+
+  <!-- Ranking Section -->
+  <section id="ranking">
+    <h2 class="section-title">Ranking</h2>
     <div class="ranking-grid" id="ranking-grid">
       <div class="ranking-loading">Loading...</div>
     </div>
-  </div>
+  </section>
 
+  <!-- Ranking Modal -->
   <div class="ranking-overlay" id="ranking-overlay">
     <div class="ranking-modal">
       <div class="ranking-modal-header">
@@ -338,118 +776,592 @@
     </div>
   </div>
 
+  <!-- Status Section -->
+  <section id="status">
+    <h2 class="section-title">Status</h2>
+    <div class="status-grid" id="status-grid"></div>
+  </section>
+
   <footer>&copy; 2025 AI Studio Paul Tokyo</footer>
 
   <script>
-    const SHEET_CSV = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vTK9SAFKJrv3hyi6mulfb3HAaiAYmu0dKx8MOw5gwX4LJtOanKVMoti5DoDVRwix3DHsKX9KqsBF9si/pub?output=csv';
+  // ════════════════════════════════════════════════
+  // WebGL Hero Background — Simplex Noise Shader
+  // ════════════════════════════════════════════════
+  (function initHeroGL() {
+    const canvas = document.getElementById('hero-canvas');
+    const gl = canvas.getContext('webgl2') || canvas.getContext('webgl');
+    if (!gl) { canvas.style.background = '#0a0a0f'; return; }
 
-    // CSVパース: A=タイトル B=URL C=説明 D=サムネ(未使用) E=絵文字 F=背景色 G=文字色 H=フォント(en/ja)
-    function parseCSV(text) {
-      const lines = text.split('\n').filter(l => l.trim());
-      const rows = [];
-      for (let i = 1; i < lines.length; i++) {
-        const cols = [];
-        let current = '';
-        let inQuotes = false;
-        for (const ch of lines[i]) {
-          if (ch === '"') { inQuotes = !inQuotes; }
-          else if (ch === ',' && !inQuotes) { cols.push(current.trim()); current = ''; }
-          else { current += ch; }
+    const vertSrc = `#version 300 es
+    in vec2 a_pos;
+    void main() { gl_Position = vec4(a_pos, 0.0, 1.0); }`;
+
+    const fragSrc = `#version 300 es
+    precision highp float;
+    uniform float u_time;
+    uniform vec2 u_mouse;
+    uniform vec2 u_resolution;
+    out vec4 fragColor;
+
+    // Simplex 3D noise
+    vec4 permute(vec4 x){return mod(((x*34.0)+1.0)*x,289.0);}
+    vec4 taylorInvSqrt(vec4 r){return 1.79284291400159-0.85373472095314*r;}
+
+    float snoise(vec3 v){
+      const vec2 C=vec2(1.0/6.0,1.0/3.0);
+      const vec4 D=vec4(0.0,0.5,1.0,2.0);
+      vec3 i=floor(v+dot(v,C.yyy));
+      vec3 x0=v-i+dot(i,C.xxx);
+      vec3 g=step(x0.yzx,x0.xyz);
+      vec3 l=1.0-g;
+      vec3 i1=min(g.xyz,l.zxy);
+      vec3 i2=max(g.xyz,l.zxy);
+      vec3 x1=x0-i1+C.xxx;
+      vec3 x2=x0-i2+C.yyy;
+      vec3 x3=x0-D.yyy;
+      i=mod(i,289.0);
+      vec4 p=permute(permute(permute(
+        i.z+vec4(0.0,i1.z,i2.z,1.0))
+        +i.y+vec4(0.0,i1.y,i2.y,1.0))
+        +i.x+vec4(0.0,i1.x,i2.x,1.0));
+      float n_=1.0/7.0;
+      vec3 ns=n_*D.wyz-D.xzx;
+      vec4 j=p-49.0*floor(p*ns.z*ns.z);
+      vec4 x_=floor(j*ns.z);
+      vec4 y_=floor(j-7.0*x_);
+      vec4 x=x_*ns.x+ns.yyyy;
+      vec4 y=y_*ns.x+ns.yyyy;
+      vec4 h=1.0-abs(x)-abs(y);
+      vec4 b0=vec4(x.xy,y.xy);
+      vec4 b1=vec4(x.zw,y.zw);
+      vec4 s0=floor(b0)*2.0+1.0;
+      vec4 s1=floor(b1)*2.0+1.0;
+      vec4 sh=-step(h,vec4(0.0));
+      vec4 a0=b0.xzyw+s0.xzyw*sh.xxyy;
+      vec4 a1=b1.xzyw+s1.xzyw*sh.zzww;
+      vec3 p0=vec3(a0.xy,h.x);
+      vec3 p1=vec3(a0.zw,h.y);
+      vec3 p2=vec3(a1.xy,h.z);
+      vec3 p3=vec3(a1.zw,h.w);
+      vec4 norm=taylorInvSqrt(vec4(dot(p0,p0),dot(p1,p1),dot(p2,p2),dot(p3,p3)));
+      p0*=norm.x;p1*=norm.y;p2*=norm.z;p3*=norm.w;
+      vec4 m=max(0.6-vec4(dot(x0,x0),dot(x1,x1),dot(x2,x2),dot(x3,x3)),0.0);
+      m=m*m;
+      return 42.0*dot(m*m,vec4(dot(p0,x0),dot(p1,x1),dot(p2,x2),dot(p3,x3)));
+    }
+
+    vec3 hsv2rgb(vec3 c){
+      vec4 K=vec4(1.0,2.0/3.0,1.0/3.0,3.0);
+      vec3 p=abs(fract(c.xxx+K.xyz)*6.0-K.www);
+      return c.z*mix(K.xxx,clamp(p-K.xxx,0.0,1.0),c.y);
+    }
+
+    void main(){
+      vec2 uv=gl_FragCoord.xy/u_resolution;
+      float n=0.0;
+      n+=0.5*snoise(vec3(uv*2.0,u_time*0.15));
+      n+=0.25*snoise(vec3(uv*4.0,u_time*0.2));
+      n+=0.125*snoise(vec3(uv*8.0,u_time*0.25));
+      float hue=0.6+u_mouse.x*0.15+n*0.1;
+      float sat=0.3+u_mouse.y*0.1;
+      float val=0.06+n*0.06;
+      vec3 color=hsv2rgb(vec3(hue,sat,val));
+      fragColor=vec4(color,1.0);
+    }`;
+
+    // Fallback for WebGL1
+    const fragSrcV1 = `precision highp float;
+    uniform float u_time;
+    uniform vec2 u_mouse;
+    uniform vec2 u_resolution;
+
+    vec4 permute(vec4 x){return mod(((x*34.0)+1.0)*x,289.0);}
+    vec4 taylorInvSqrt(vec4 r){return 1.79284291400159-0.85373472095314*r;}
+
+    float snoise(vec3 v){
+      const vec2 C=vec2(1.0/6.0,1.0/3.0);
+      const vec4 D=vec4(0.0,0.5,1.0,2.0);
+      vec3 i=floor(v+dot(v,C.yyy));
+      vec3 x0=v-i+dot(i,C.xxx);
+      vec3 g=step(x0.yzx,x0.xyz);
+      vec3 l=1.0-g;
+      vec3 i1=min(g.xyz,l.zxy);
+      vec3 i2=max(g.xyz,l.zxy);
+      vec3 x1=x0-i1+C.xxx;
+      vec3 x2=x0-i2+C.yyy;
+      vec3 x3=x0-D.yyy;
+      i=mod(i,289.0);
+      vec4 p=permute(permute(permute(
+        i.z+vec4(0.0,i1.z,i2.z,1.0))
+        +i.y+vec4(0.0,i1.y,i2.y,1.0))
+        +i.x+vec4(0.0,i1.x,i2.x,1.0));
+      float n_=1.0/7.0;
+      vec3 ns=n_*D.wyz-D.xzx;
+      vec4 j=p-49.0*floor(p*ns.z*ns.z);
+      vec4 x_=floor(j*ns.z);
+      vec4 y_=floor(j-7.0*x_);
+      vec4 x=x_*ns.x+ns.yyyy;
+      vec4 y=y_*ns.x+ns.yyyy;
+      vec4 h=1.0-abs(x)-abs(y);
+      vec4 b0=vec4(x.xy,y.xy);
+      vec4 b1=vec4(x.zw,y.zw);
+      vec4 s0=floor(b0)*2.0+1.0;
+      vec4 s1=floor(b1)*2.0+1.0;
+      vec4 sh=-step(h,vec4(0.0));
+      vec4 a0=b0.xzyw+s0.xzyw*sh.xxyy;
+      vec4 a1=b1.xzyw+s1.xzyw*sh.zzww;
+      vec3 p0=vec3(a0.xy,h.x);
+      vec3 p1=vec3(a0.zw,h.y);
+      vec3 p2=vec3(a1.xy,h.z);
+      vec3 p3=vec3(a1.zw,h.w);
+      vec4 norm=taylorInvSqrt(vec4(dot(p0,p0),dot(p1,p1),dot(p2,p2),dot(p3,p3)));
+      p0*=norm.x;p1*=norm.y;p2*=norm.z;p3*=norm.w;
+      vec4 m=max(0.6-vec4(dot(x0,x0),dot(x1,x1),dot(x2,x2),dot(x3,x3)),0.0);
+      m=m*m;
+      return 42.0*dot(m*m,vec4(dot(p0,x0),dot(p1,x1),dot(p2,x2),dot(p3,x3)));
+    }
+
+    vec3 hsv2rgb(vec3 c){
+      vec4 K=vec4(1.0,2.0/3.0,1.0/3.0,3.0);
+      vec3 p=abs(fract(c.xxx+K.xyz)*6.0-K.www);
+      return c.z*mix(K.xxx,clamp(p-K.xxx,0.0,1.0),c.y);
+    }
+
+    void main(){
+      vec2 uv=gl_FragCoord.xy/u_resolution;
+      float n=0.0;
+      n+=0.5*snoise(vec3(uv*2.0,u_time*0.15));
+      n+=0.25*snoise(vec3(uv*4.0,u_time*0.2));
+      n+=0.125*snoise(vec3(uv*8.0,u_time*0.25));
+      float hue=0.6+u_mouse.x*0.15+n*0.1;
+      float sat=0.3+u_mouse.y*0.1;
+      float val=0.06+n*0.06;
+      vec3 color=hsv2rgb(vec3(hue,sat,val));
+      gl_FragColor=vec4(color,1.0);
+    }`;
+
+    const vertSrcV1 = `attribute vec2 a_pos;
+    void main() { gl_Position = vec4(a_pos, 0.0, 1.0); }`;
+
+    const isWebGL2 = gl instanceof WebGL2RenderingContext;
+
+    function compile(type, src) {
+      const s = gl.createShader(type);
+      gl.shaderSource(s, src);
+      gl.compileShader(s);
+      if (!gl.getShaderParameter(s, gl.COMPILE_STATUS)) {
+        console.warn('Shader error:', gl.getShaderInfoLog(s));
+        return null;
+      }
+      return s;
+    }
+
+    const vs = compile(gl.VERTEX_SHADER, isWebGL2 ? vertSrc : vertSrcV1);
+    const fs = compile(gl.FRAGMENT_SHADER, isWebGL2 ? fragSrc : fragSrcV1);
+    if (!vs || !fs) { canvas.style.background = '#0a0a0f'; return; }
+
+    const prog = gl.createProgram();
+    gl.attachShader(prog, vs);
+    gl.attachShader(prog, fs);
+    if (isWebGL2) gl.bindAttribLocation(prog, 0, 'a_pos');
+    gl.linkProgram(prog);
+    gl.useProgram(prog);
+
+    const buf = gl.createBuffer();
+    gl.bindBuffer(gl.ARRAY_BUFFER, buf);
+    gl.bufferData(gl.ARRAY_BUFFER, new Float32Array([-1,-1, 1,-1, -1,1, 1,1]), gl.STATIC_DRAW);
+
+    const aPos = gl.getAttribLocation(prog, 'a_pos');
+    gl.enableVertexAttribArray(aPos);
+    gl.vertexAttribPointer(aPos, 2, gl.FLOAT, false, 0, 0);
+
+    const uTime = gl.getUniformLocation(prog, 'u_time');
+    const uMouse = gl.getUniformLocation(prog, 'u_mouse');
+    const uRes = gl.getUniformLocation(prog, 'u_resolution');
+
+    let mx = 0.5, my = 0.5;
+    document.addEventListener('mousemove', e => {
+      mx = e.clientX / window.innerWidth;
+      my = 1.0 - e.clientY / window.innerHeight;
+    });
+
+    let heroVisible = true;
+    const heroObserver = new IntersectionObserver(entries => {
+      heroVisible = entries[0].isIntersecting;
+    }, { threshold: 0 });
+    heroObserver.observe(canvas);
+
+    function resize() {
+      const dpr = Math.min(window.devicePixelRatio, 2) * 0.5; // half res for perf
+      canvas.width = canvas.clientWidth * dpr;
+      canvas.height = canvas.clientHeight * dpr;
+    }
+    resize();
+    window.addEventListener('resize', resize);
+
+    const start = performance.now();
+    function frame() {
+      if (heroVisible) {
+        gl.viewport(0, 0, canvas.width, canvas.height);
+        gl.uniform1f(uTime, (performance.now() - start) / 1000);
+        gl.uniform2f(uMouse, mx, my);
+        gl.uniform2f(uRes, canvas.width, canvas.height);
+        gl.drawArrays(gl.TRIANGLE_STRIP, 0, 4);
+      }
+      requestAnimationFrame(frame);
+    }
+    frame();
+  })();
+
+  // ════════════════════════════════════════════════
+  // Typing Animation
+  // ════════════════════════════════════════════════
+  (function initTyping() {
+    const WORDS = ['Creative Director', 'Copywriter', 'Web Developer', 'Planner'];
+    const el = document.getElementById('typing-text');
+    let wordIdx = 0, charIdx = 0, deleting = false;
+
+    function tick() {
+      const word = WORDS[wordIdx];
+      if (!deleting) {
+        el.textContent = word.slice(0, ++charIdx);
+        if (charIdx === word.length) {
+          setTimeout(() => { deleting = true; tick(); }, 2000);
+          return;
         }
-        cols.push(current.trim());
-        if (cols[0]) rows.push({
-          title: cols[0],
-          url:   cols[1] || '',
-          desc:  cols[2] || '',
-          thumb: cols[3] || '',
-          emoji: cols[4] || '🔗',
-          bg:    cols[5] || 'linear-gradient(135deg, #2a2a2a 0%, #1a1a1a 100%)',
-          color: cols[6] || '#e8e0d0',
-          font:  cols[7] || 'ja'
-        });
+        setTimeout(tick, 80 + Math.random() * 40);
+      } else {
+        el.textContent = word.slice(0, --charIdx);
+        if (charIdx === 0) {
+          deleting = false;
+          wordIdx = (wordIdx + 1) % WORDS.length;
+          setTimeout(tick, 400);
+          return;
+        }
+        setTimeout(tick, 40);
       }
-      return rows;
     }
+    setTimeout(tick, 800);
+  })();
 
-    fetch(SHEET_CSV)
-      .then(r => r.text())
-      .then(text => {
-        const items = parseCSV(text);
-        const grid = document.getElementById('grid');
-        grid.innerHTML = items.map(item => {
-          const labelClass = item.font === 'en' ? 'panel-label-en' : 'panel-label';
-          return `
-          <a href="${item.url}" target="_blank" rel="noopener" class="panel"
-             style="background:${item.bg};">
-            <div class="panel-emoji">${item.emoji}</div>
-            <div class="${labelClass}" style="color:${item.color}">${item.title}</div>
-            <div class="panel-sub" style="color:${item.color}">${item.desc}</div>
-          </a>
-        `}).join('');
-      })
-      .catch(() => {
-        document.getElementById('grid').innerHTML = '<div class="loading">Failed to load</div>';
+  // ════════════════════════════════════════════════
+  // Custom Cursor
+  // ════════════════════════════════════════════════
+  (function initCursor() {
+    if ('ontouchstart' in window || navigator.maxTouchPoints > 0) return;
+    const cursor = document.getElementById('custom-cursor');
+    if (!cursor) return;
+
+    document.addEventListener('mousemove', e => {
+      cursor.style.transform = `translate(${e.clientX}px, ${e.clientY}px)`;
+    });
+
+    document.addEventListener('mouseover', e => {
+      const t = e.target.closest('a, button, .ranking-card, .work-card');
+      if (t) cursor.classList.add('hover');
+    });
+    document.addEventListener('mouseout', e => {
+      const t = e.target.closest('a, button, .ranking-card, .work-card');
+      if (t) cursor.classList.remove('hover');
+    });
+  })();
+
+  // ════════════════════════════════════════════════
+  // Navigation — Scroll & Hamburger
+  // ════════════════════════════════════════════════
+  (function initNav() {
+    const nav = document.getElementById('nav');
+    const hamburger = document.getElementById('nav-hamburger');
+
+    window.addEventListener('scroll', () => {
+      nav.classList.toggle('scrolled', window.scrollY > 50);
+    }, { passive: true });
+
+    hamburger.addEventListener('click', () => {
+      hamburger.classList.toggle('open');
+      nav.classList.toggle('mobile-open');
+    });
+
+    nav.querySelectorAll('a').forEach(a => {
+      a.addEventListener('click', () => {
+        hamburger.classList.remove('open');
+        nav.classList.remove('mobile-open');
       });
+    });
+  })();
 
-    // MY RANKING
-    const RANKING_API = 'https://my-ranking-api.hiroshinagano0113.workers.dev';
+  // ════════════════════════════════════════════════
+  // Scroll Progress Fallback
+  // ════════════════════════════════════════════════
+  (function initProgressFallback() {
+    if (CSS.supports && CSS.supports('animation-timeline', 'scroll()')) return;
+    const bar = document.getElementById('scroll-progress');
+    window.addEventListener('scroll', () => {
+      const max = document.documentElement.scrollHeight - window.innerHeight;
+      bar.style.transform = `scaleX(${max > 0 ? window.scrollY / max : 0})`;
+    }, { passive: true });
+  })();
 
-    fetch(`${RANKING_API}/rankings`)
-      .then(r => r.json())
-      .then(categories => {
-        const grid = document.getElementById('ranking-grid');
-        grid.innerHTML = categories.map(c => `
-          <div class="ranking-card" data-id="${c.id}" data-name="${c.name}" data-icon="${c.icon}">
-            <div class="ranking-card-icon">${c.icon}</div>
-            <div class="ranking-card-name">${c.name}</div>
-          </div>
-        `).join('');
-
-        grid.addEventListener('click', e => {
-          const card = e.target.closest('.ranking-card');
-          if (!card) return;
-          openRanking(card.dataset.id, card.dataset.icon, card.dataset.name);
-        });
-      })
-      .catch(() => {
-        document.getElementById('ranking-grid').innerHTML = '<div class="ranking-loading">Failed to load</div>';
-      });
-
-    function openRanking(id, icon, name) {
-      const overlay = document.getElementById('ranking-overlay');
-      const list = document.getElementById('ranking-list');
-      const title = document.getElementById('ranking-modal-title');
-      title.innerHTML = `<span>${icon}</span>${name}`;
-      list.innerHTML = '<div class="ranking-loading">Loading...</div>';
-      overlay.classList.add('active');
-
-      fetch(`${RANKING_API}/rankings/${id}`)
-        .then(r => r.json())
-        .then(items => {
-          if (!items.length) {
-            list.innerHTML = '<div class="ranking-loading">No items</div>';
-            return;
+  // ════════════════════════════════════════════════
+  // Intersection Observer — Reveal Animations
+  // ════════════════════════════════════════════════
+  function initScrollReveal() {
+    // Section titles (fallback for non-scroll-timeline)
+    if (!(CSS.supports && CSS.supports('animation-timeline', 'view()'))) {
+      const titles = document.querySelectorAll('.section-title');
+      const titleObs = new IntersectionObserver(entries => {
+        entries.forEach(e => {
+          if (e.isIntersecting) {
+            e.target.classList.add('revealed');
+            titleObs.unobserve(e.target);
           }
-          list.innerHTML = items.map(item => `
-            <li class="ranking-item">
-              <div class="ranking-num">${item.rank}</div>
-              <div class="ranking-item-title">${item.title}</div>
-            </li>
-          `).join('');
-        })
-        .catch(() => {
-          list.innerHTML = '<div class="ranking-loading">Failed to load</div>';
         });
+      }, { threshold: 0.1 });
+      titles.forEach(t => titleObs.observe(t));
     }
 
-    document.getElementById('ranking-close').addEventListener('click', () => {
-      document.getElementById('ranking-overlay').classList.remove('active');
-    });
-    document.getElementById('ranking-overlay').addEventListener('click', e => {
-      if (e.target === e.currentTarget) {
-        e.currentTarget.classList.remove('active');
+    // Work cards
+    const cards = document.querySelectorAll('.work-card');
+    const cardObs = new IntersectionObserver(entries => {
+      entries.forEach(entry => {
+        if (entry.isIntersecting) {
+          const allCards = Array.from(cards);
+          const idx = allCards.indexOf(entry.target);
+          const cols = window.innerWidth > 900 ? 3 : window.innerWidth > 480 ? 2 : 1;
+          const col = idx % cols;
+          const directions = cols === 3 ? ['from-left', 'from-bottom', 'from-right'] :
+                             cols === 2 ? ['from-left', 'from-right'] : ['from-bottom'];
+          entry.target.classList.add(directions[col]);
+          entry.target.style.transitionDelay = `${(col) * 0.12}s`;
+          requestAnimationFrame(() => {
+            entry.target.classList.add('revealed');
+          });
+          cardObs.unobserve(entry.target);
+        }
+      });
+    }, { threshold: 0.1 });
+    cards.forEach(c => cardObs.observe(c));
+
+    // Ranking cards
+    const rankCards = document.querySelectorAll('.ranking-card');
+    const rankObs = new IntersectionObserver(entries => {
+      entries.forEach(entry => {
+        if (entry.isIntersecting) {
+          const idx = Array.from(rankCards).indexOf(entry.target);
+          entry.target.style.transitionDelay = `${idx * 0.08}s`;
+          entry.target.classList.add('revealed');
+          rankObs.unobserve(entry.target);
+        }
+      });
+    }, { threshold: 0.1 });
+    rankCards.forEach(c => rankObs.observe(c));
+
+    // Status items
+    const statusItems = document.querySelectorAll('.status-item');
+    const statusObs = new IntersectionObserver(entries => {
+      entries.forEach(entry => {
+        if (entry.isIntersecting) {
+          const idx = Array.from(statusItems).indexOf(entry.target);
+          entry.target.style.transitionDelay = `${idx * 0.1}s`;
+          entry.target.classList.add('revealed');
+          statusObs.unobserve(entry.target);
+        }
+      });
+    }, { threshold: 0.1 });
+    statusItems.forEach(s => statusObs.observe(s));
+  }
+
+  // ════════════════════════════════════════════════
+  // Works — Google Sheets CSV
+  // ════════════════════════════════════════════════
+  const SHEET_CSV = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vTK9SAFKJrv3hyi6mulfb3HAaiAYmu0dKx8MOw5gwX4LJtOanKVMoti5DoDVRwix3DHsKX9KqsBF9si/pub?output=csv';
+
+  function parseCSV(text) {
+    const lines = text.split('\n').filter(l => l.trim());
+    const rows = [];
+    for (let i = 1; i < lines.length; i++) {
+      const cols = [];
+      let current = '';
+      let inQuotes = false;
+      for (const ch of lines[i]) {
+        if (ch === '"') { inQuotes = !inQuotes; }
+        else if (ch === ',' && !inQuotes) { cols.push(current.trim()); current = ''; }
+        else { current += ch; }
       }
+      cols.push(current.trim());
+      if (cols[0]) rows.push({
+        title: cols[0],
+        url:   cols[1] || '',
+        desc:  cols[2] || '',
+        thumb: cols[3] || '',
+        emoji: cols[4] || '🔗',
+        bg:    cols[5] || 'linear-gradient(135deg, #2a2a2a 0%, #1a1a1a 100%)',
+        color: cols[6] || '#e8e0d0',
+        font:  cols[7] || 'ja'
+      });
+    }
+    return rows;
+  }
+
+  fetch(SHEET_CSV)
+    .then(r => r.text())
+    .then(text => {
+      const items = parseCSV(text);
+      const grid = document.getElementById('works-grid');
+      grid.innerHTML = items.map(item => {
+        const titleClass = (item.font && item.font.toLowerCase() !== 'ja') ? 'work-title-en' : 'work-title';
+        return `
+        <a href="${item.url}" target="_blank" rel="noopener" class="work-card" style="--accent: ${item.color};">
+          <div class="work-card-bg" style="background: ${item.bg};"></div>
+          <div class="work-card-shine"></div>
+          <div class="work-card-content">
+            <div class="work-emoji">${item.emoji}</div>
+            <div class="${titleClass}" style="color: ${item.color};">${item.title}</div>
+            <div class="work-desc" style="color: ${item.color};">${item.desc}</div>
+          </div>
+          <div class="work-arrow" style="color: ${item.color};">→</div>
+        </a>`;
+      }).join('');
+      initScrollReveal();
+    })
+    .catch(() => {
+      document.getElementById('works-grid').innerHTML = '<div class="works-loading">Failed to load</div>';
     });
+
+  // ════════════════════════════════════════════════
+  // MY RANKING — API
+  // ════════════════════════════════════════════════
+  const RANKING_API = 'https://my-ranking-api.hiroshinagano0113.workers.dev';
+
+  fetch(`${RANKING_API}/rankings`)
+    .then(r => r.json())
+    .then(categories => {
+      const grid = document.getElementById('ranking-grid');
+      grid.innerHTML = categories.map(c => `
+        <div class="ranking-card" data-id="${c.id}" data-name="${c.name}" data-icon="${c.icon}">
+          <div class="ranking-card-icon">${c.icon}</div>
+          <div class="ranking-card-name">${c.name}</div>
+        </div>
+      `).join('');
+
+      grid.addEventListener('click', e => {
+        const card = e.target.closest('.ranking-card');
+        if (!card) return;
+        openRanking(card.dataset.id, card.dataset.icon, card.dataset.name);
+      });
+
+      // Trigger reveal for ranking cards after they're loaded
+      setTimeout(() => {
+        const rankCards = document.querySelectorAll('.ranking-card');
+        const rankObs = new IntersectionObserver(entries => {
+          entries.forEach(entry => {
+            if (entry.isIntersecting) {
+              const idx = Array.from(rankCards).indexOf(entry.target);
+              entry.target.style.transitionDelay = `${idx * 0.08}s`;
+              entry.target.classList.add('revealed');
+              rankObs.unobserve(entry.target);
+            }
+          });
+        }, { threshold: 0.1 });
+        rankCards.forEach(c => rankObs.observe(c));
+      }, 50);
+    })
+    .catch(() => {
+      document.getElementById('ranking-grid').innerHTML = '<div class="ranking-loading">Failed to load</div>';
+    });
+
+  function openRanking(id, icon, name) {
+    const overlay = document.getElementById('ranking-overlay');
+    const list = document.getElementById('ranking-list');
+    const title = document.getElementById('ranking-modal-title');
+    title.innerHTML = `<span>${icon}</span>${name}`;
+    list.innerHTML = '<div class="ranking-loading">Loading...</div>';
+    overlay.classList.add('active');
+
+    fetch(`${RANKING_API}/rankings/${id}`)
+      .then(r => r.json())
+      .then(items => {
+        if (!items.length) {
+          list.innerHTML = '<div class="ranking-loading">No items</div>';
+          return;
+        }
+        list.innerHTML = items.map(item => `
+          <li class="ranking-item">
+            <div class="ranking-num">${item.rank}</div>
+            <div class="ranking-item-title">${item.title}</div>
+          </li>
+        `).join('');
+      })
+      .catch(() => {
+        list.innerHTML = '<div class="ranking-loading">Failed to load</div>';
+      });
+  }
+
+  document.getElementById('ranking-close').addEventListener('click', () => {
+    document.getElementById('ranking-overlay').classList.remove('active');
+  });
+  document.getElementById('ranking-overlay').addEventListener('click', e => {
+    if (e.target === e.currentTarget) {
+      e.currentTarget.classList.remove('active');
+    }
+  });
+
+  // ════════════════════════════════════════════════
+  // Service Status
+  // ════════════════════════════════════════════════
+  (function initStatus() {
+    const services = [
+      { name: '生成新聞', url: 'https://and-and-and.com' },
+      { name: 'MY RANKING', url: 'https://my-ranking-api.hiroshinagano0113.workers.dev/rankings' },
+      { name: 'Studio Paul', url: 'https://paul13131313.github.io/studio-paul/' },
+      { name: 'SOUND COSMOS', url: 'https://paul13131313.github.io/sound-cosmos/' },
+      { name: 'SKILL GALAXY', url: 'https://paul13131313.github.io/skill-galaxy/' }
+    ];
+
+    const grid = document.getElementById('status-grid');
+    grid.innerHTML = services.map(s =>
+      `<div class="status-item"><div class="status-dot" data-url="${s.url}"></div>${s.name}</div>`
+    ).join('');
+
+    const dots = grid.querySelectorAll('.status-dot');
+    dots.forEach(dot => {
+      const url = dot.dataset.url;
+      fetch(url, { mode: 'no-cors', cache: 'no-cache' })
+        .then(() => { dot.classList.add('up'); })
+        .catch(() => { dot.classList.add('down'); });
+    });
+
+    // Observe status items for reveal
+    setTimeout(() => {
+      const items = document.querySelectorAll('.status-item');
+      const obs = new IntersectionObserver(entries => {
+        entries.forEach(entry => {
+          if (entry.isIntersecting) {
+            const idx = Array.from(items).indexOf(entry.target);
+            entry.target.style.transitionDelay = `${idx * 0.1}s`;
+            entry.target.classList.add('revealed');
+            obs.unobserve(entry.target);
+          }
+        });
+      }, { threshold: 0.1 });
+      items.forEach(i => obs.observe(i));
+    }, 50);
+  })();
+
+  // ════════════════════════════════════════════════
+  // Hero scroll fallback (non-scroll-timeline)
+  // ════════════════════════════════════════════════
+  (function heroFallback() {
+    if (CSS.supports && CSS.supports('animation-timeline', 'scroll()')) return;
+    const content = document.querySelector('.hero-content');
+    window.addEventListener('scroll', () => {
+      const t = Math.min(window.scrollY / (window.innerHeight * 0.3), 1);
+      content.style.opacity = 1 - t;
+      content.style.transform = `translateY(${-80 * t}px) scale(${1 - 0.05 * t})`;
+      content.style.filter = `blur(${6 * t}px)`;
+    }, { passive: true });
+  })();
   </script>
 </body>
 </html>
