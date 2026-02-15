@@ -308,9 +308,43 @@
       filter: blur(0);
     }
 
+    /* ── Section Description ── */
+    .section-desc {
+      text-align: center;
+      font-size: 0.85rem;
+      color: var(--muted);
+      letter-spacing: 0.05em;
+      margin-top: -0.5rem;
+      margin-bottom: 2rem;
+      opacity: 0;
+      transform: translateY(10px);
+      transition: opacity 0.6s ease 0.2s, transform 0.6s ease 0.2s;
+    }
+    .section-desc.revealed {
+      opacity: 1;
+      transform: translateY(0);
+    }
+
+    /* ── Section Divider ── */
+    .section-divider {
+      max-width: 1100px;
+      margin: 0 auto;
+      padding: 0 24px;
+    }
+    .section-divider hr {
+      border: none;
+      border-top: 1px solid var(--border);
+      opacity: 0.4;
+    }
+
     /* ── Works Section ── */
     #works {
       padding: 6rem 0 4rem;
+    }
+
+    /* ── Practice Section ── */
+    #practice {
+      padding: 3rem 0 4rem;
     }
 
     .works-grid {
@@ -728,6 +762,7 @@
   <!-- Navigation -->
   <nav id="nav">
     <a href="#works">Works</a>
+    <a href="#practice">Practice</a>
     <a href="#ranking">Ranking</a>
     <a href="#status">Status</a>
   </nav>
@@ -752,7 +787,20 @@
   <!-- Works Section -->
   <section id="works">
     <h2 class="section-title">Works</h2>
+    <p class="section-desc">制作実績</p>
     <div class="works-grid" id="works-grid">
+      <div class="works-loading">Loading...</div>
+    </div>
+  </section>
+
+  <!-- Section Divider -->
+  <div class="section-divider"><hr></div>
+
+  <!-- Practice Section -->
+  <section id="practice">
+    <h2 class="section-title">Practice</h2>
+    <p class="section-desc">スキル習得のための実験・練習</p>
+    <div class="works-grid" id="practice-grid">
       <div class="works-loading">Loading...</div>
     </div>
   </section>
@@ -1109,7 +1157,7 @@
   function initScrollReveal() {
     // Section titles (fallback for non-scroll-timeline)
     if (!(CSS.supports && CSS.supports('animation-timeline', 'view()'))) {
-      const titles = document.querySelectorAll('.section-title');
+      const titles = document.querySelectorAll('.section-title, .section-desc');
       const titleObs = new IntersectionObserver(entries => {
         entries.forEach(e => {
           if (e.isIntersecting) {
@@ -1191,42 +1239,51 @@
       }
       cols.push(current.trim());
       if (cols[0]) rows.push({
-        title: cols[0],
-        url:   cols[1] || '',
-        desc:  cols[2] || '',
-        thumb: cols[3] || '',
-        emoji: cols[4] || '🔗',
-        bg:    cols[5] || 'linear-gradient(135deg, #2a2a2a 0%, #1a1a1a 100%)',
-        color: cols[6] || '#e8e0d0',
-        font:  cols[7] || 'ja'
+        title:    cols[0],
+        url:      cols[1] || '',
+        desc:     cols[2] || '',
+        category: (cols[3] || '').toUpperCase().trim(),
+        emoji:    cols[4] || '🔗',
+        bg:       cols[5] || 'linear-gradient(135deg, #2a2a2a 0%, #1a1a1a 100%)',
+        color:    cols[6] || '#e8e0d0',
+        font:     cols[7] || 'ja'
       });
     }
     return rows;
+  }
+
+  function renderCards(items) {
+    return items.map(item => {
+      const titleClass = (item.font && item.font.toLowerCase() !== 'ja') ? 'work-title-en' : 'work-title';
+      return `
+      <a href="${item.url}" target="_blank" rel="noopener" class="work-card" style="--accent: ${item.color};">
+        <div class="work-card-bg" style="background: ${item.bg};"></div>
+        <div class="work-card-shine"></div>
+        <div class="work-card-content">
+          <div class="work-emoji">${item.emoji}</div>
+          <div class="${titleClass}" style="color: ${item.color};">${item.title}</div>
+          <div class="work-desc" style="color: ${item.color};">${item.desc}</div>
+        </div>
+        <div class="work-arrow" style="color: ${item.color};">→</div>
+      </a>`;
+    }).join('');
   }
 
   fetch(SHEET_CSV)
     .then(r => r.text())
     .then(text => {
       const items = parseCSV(text);
-      const grid = document.getElementById('works-grid');
-      grid.innerHTML = items.map(item => {
-        const titleClass = (item.font && item.font.toLowerCase() !== 'ja') ? 'work-title-en' : 'work-title';
-        return `
-        <a href="${item.url}" target="_blank" rel="noopener" class="work-card" style="--accent: ${item.color};">
-          <div class="work-card-bg" style="background: ${item.bg};"></div>
-          <div class="work-card-shine"></div>
-          <div class="work-card-content">
-            <div class="work-emoji">${item.emoji}</div>
-            <div class="${titleClass}" style="color: ${item.color};">${item.title}</div>
-            <div class="work-desc" style="color: ${item.color};">${item.desc}</div>
-          </div>
-          <div class="work-arrow" style="color: ${item.color};">→</div>
-        </a>`;
-      }).join('');
+      const worksItems = items.filter(i => i.category !== 'PRACTICE');
+      const practiceItems = items.filter(i => i.category === 'PRACTICE');
+
+      document.getElementById('works-grid').innerHTML = renderCards(worksItems);
+      document.getElementById('practice-grid').innerHTML = renderCards(practiceItems);
+
       initScrollReveal();
     })
     .catch(() => {
       document.getElementById('works-grid').innerHTML = '<div class="works-loading">Failed to load</div>';
+      document.getElementById('practice-grid').innerHTML = '<div class="works-loading">Failed to load</div>';
     });
 
   // ════════════════════════════════════════════════
