@@ -222,6 +222,17 @@
       z-index: 0;
     }
 
+    #hero::after {
+      content: '';
+      position: absolute;
+      bottom: 0; left: 0;
+      width: 100%;
+      height: 30vh;
+      background: linear-gradient(to bottom, transparent 0%, var(--bg-primary) 100%);
+      z-index: 0;
+      pointer-events: none;
+    }
+
     .hero-typing {
       position: relative;
       z-index: 1;
@@ -230,16 +241,17 @@
       font-size: clamp(2.5rem, 8vw, 7rem);
       letter-spacing: -0.02em;
       text-transform: uppercase;
-      color: rgba(10, 10, 15, 0.9);
+      color: #ffffff;
       min-height: 1.2em;
       line-height: 1;
+      text-shadow: 0 2px 20px rgba(0, 0, 0, 0.3);
     }
 
     .typing-cursor {
       display: inline-block;
       width: clamp(3px, 0.5vw, 6px);
       height: 0.85em;
-      background: #0033cc;
+      background: #ffffff;
       margin-left: 0.05em;
       animation: cursor-blink 0.5s step-end infinite;
       vertical-align: text-bottom;
