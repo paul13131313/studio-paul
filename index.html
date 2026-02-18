@@ -211,6 +211,34 @@
       z-index: 0;
     }
 
+    .hero-typing {
+      position: relative;
+      z-index: 1;
+      font-family: 'Syne', sans-serif;
+      font-weight: 800;
+      font-size: clamp(2.5rem, 8vw, 7rem);
+      letter-spacing: -0.02em;
+      text-transform: uppercase;
+      color: var(--text-primary);
+      min-height: 1.2em;
+      line-height: 1;
+    }
+
+    .typing-cursor {
+      display: inline-block;
+      width: clamp(3px, 0.5vw, 6px);
+      height: 0.85em;
+      background: var(--gold);
+      margin-left: 0.05em;
+      animation: cursor-blink 0.5s step-end infinite;
+      vertical-align: text-bottom;
+    }
+
+    @keyframes cursor-blink {
+      0%, 100% { opacity: 1; }
+      50% { opacity: 0; }
+    }
+
     .scroll-indicator {
       position: absolute;
       bottom: 2.5rem;
@@ -789,6 +817,9 @@
   <!-- Hero Section -->
   <section id="hero">
     <canvas id="hero-canvas"></canvas>
+    <div class="hero-typing">
+      <span id="typing-text"></span><span class="typing-cursor"></span>
+    </div>
     <div class="scroll-indicator">
       <span class="scroll-text">Scroll to explore</span>
       <span class="scroll-line"></span>
@@ -1083,7 +1114,36 @@
     frame();
   })();
 
-  // (Typing animation removed — logo-only hero)
+  // ════════════════════════════════════════════════
+  // Typing Animation
+  // ════════════════════════════════════════════════
+  (function initTyping() {
+    const WORDS = ['CREATIVE DIRECTOR', 'PLANNER', 'COPYWRITER', 'WEB DEVELOPER', 'AI CREATOR'];
+    const el = document.getElementById('typing-text');
+    let wordIdx = 0, charIdx = 0, deleting = false;
+
+    function tick() {
+      const word = WORDS[wordIdx];
+      if (!deleting) {
+        el.textContent = word.slice(0, ++charIdx);
+        if (charIdx === word.length) {
+          setTimeout(() => { deleting = true; tick(); }, 1800);
+          return;
+        }
+        setTimeout(tick, 60 + Math.random() * 30);
+      } else {
+        el.textContent = word.slice(0, --charIdx);
+        if (charIdx === 0) {
+          deleting = false;
+          wordIdx = (wordIdx + 1) % WORDS.length;
+          setTimeout(tick, 300);
+          return;
+        }
+        setTimeout(tick, 30);
+      }
+    }
+    setTimeout(tick, 600);
+  })();
 
   // ════════════════════════════════════════════════
   // Custom Cursor
