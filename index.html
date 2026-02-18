@@ -83,30 +83,6 @@
       background: rgba(255, 255, 255, 0.15);
     }
 
-    /* ── Scroll Progress Bar ── */
-    .scroll-progress {
-      position: fixed;
-      top: 0;
-      left: 0;
-      width: 100%;
-      height: 2px;
-      background: linear-gradient(90deg, #667eea, #764ba2, #f093fb);
-      transform-origin: left;
-      z-index: 10000;
-      transform: scaleX(0);
-    }
-
-    @supports (animation-timeline: scroll()) {
-      .scroll-progress {
-        animation: progress-grow linear;
-        animation-timeline: scroll();
-      }
-    }
-
-    @keyframes progress-grow {
-      from { transform: scaleX(0); }
-      to { transform: scaleX(1); }
-    }
 
     /* ── Navigation ── */
     nav {
@@ -122,13 +98,6 @@
       transition: background 0.3s, backdrop-filter 0.3s;
     }
 
-    nav.scrolled {
-      background: rgba(10, 10, 15, 0.8);
-      backdrop-filter: blur(12px);
-      -webkit-backdrop-filter: blur(12px);
-      border-bottom: 1px solid rgba(255,255,255,0.05);
-    }
-
     .nav-logo {
       display: flex;
       align-items: center;
@@ -142,16 +111,8 @@
       transition: filter 0.4s ease;
     }
 
-    nav.scrolled .nav-logo img {
-      filter: invert(0) drop-shadow(0 0 20px rgba(200, 169, 110, 0.15));
-    }
-
     .nav-logo:hover img {
       filter: invert(1) drop-shadow(0 0 30px rgba(0, 0, 0, 0.2));
-    }
-
-    nav.scrolled .nav-logo:hover img {
-      filter: invert(0) drop-shadow(0 0 30px rgba(200, 169, 110, 0.3));
     }
 
     .nav-links {
@@ -172,9 +133,6 @@
     }
 
     nav a:hover { color: rgba(10, 10, 15, 0.9); }
-
-    nav.scrolled a { color: var(--text-secondary); }
-    nav.scrolled a:hover { color: var(--text-primary); }
 
     .nav-hamburger {
       display: none;
@@ -529,24 +487,26 @@
 
     .ranking-grid {
       display: grid;
-      grid-template-columns: repeat(4, 1fr);
-      gap: 1px;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 20px;
       max-width: 1100px;
       margin: 0 auto;
-      background: rgba(255,255,255,0.02);
+      padding: 0 24px;
     }
 
     .ranking-card {
-      background: rgba(255,255,255,0.02);
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: 16px;
       display: flex;
       flex-direction: column;
       align-items: center;
       justify-content: center;
       padding: 2rem 1rem;
       cursor: none;
-      transition: background 0.3s, transform 0.3s;
+      transition: border-color 0.3s, transform 0.3s;
       text-align: center;
-      aspect-ratio: 4 / 3;
+      min-height: 160px;
       opacity: 0;
       transform: translateY(30px);
     }
@@ -554,11 +514,11 @@
     .ranking-card.revealed {
       opacity: 1;
       transform: translateY(0);
-      transition: opacity 0.6s ease, transform 0.6s cubic-bezier(0.16, 1, 0.3, 1), background 0.3s;
+      transition: opacity 0.6s ease, transform 0.6s cubic-bezier(0.16, 1, 0.3, 1), border-color 0.3s;
     }
 
     .ranking-card:hover {
-      background: rgba(255,255,255,0.06);
+      border-color: rgba(255,255,255,0.15);
     }
 
     .ranking-card-icon {
@@ -705,67 +665,6 @@
       color: var(--text-secondary);
     }
 
-    /* ── Status Section ── */
-    #status {
-      position: relative;
-      z-index: 1;
-      padding: 4rem 0 2rem;
-    }
-
-    .status-grid {
-      display: flex;
-      flex-wrap: wrap;
-      justify-content: center;
-      gap: 1rem;
-      max-width: 900px;
-      margin: 0 auto;
-      padding: 0 24px;
-    }
-
-    .status-item {
-      display: flex;
-      align-items: center;
-      gap: 0.6rem;
-      padding: 0.8rem 1.2rem;
-      background: rgba(255,255,255,0.02);
-      border: 1px solid var(--border);
-      border-radius: 12px;
-      font-family: 'Space Mono', monospace;
-      font-size: 0.7rem;
-      letter-spacing: 0.05em;
-      color: var(--text-secondary);
-      opacity: 0;
-      transform: translateY(20px);
-      transition: opacity 0.5s ease, transform 0.5s ease;
-    }
-
-    .status-item.revealed {
-      opacity: 1;
-      transform: translateY(0);
-    }
-
-    .status-dot {
-      width: 8px;
-      height: 8px;
-      border-radius: 50%;
-      background: #555;
-      flex-shrink: 0;
-    }
-
-    .status-dot.up {
-      background: #48c78e;
-      animation: pulse-green 2s ease-in-out infinite;
-    }
-
-    .status-dot.down {
-      background: #f14668;
-    }
-
-    @keyframes pulse-green {
-      0%, 100% { box-shadow: 0 0 0 0 rgba(72, 199, 142, 0.4); }
-      50% { box-shadow: 0 0 0 6px rgba(72, 199, 142, 0); }
-    }
-
     /* ── Footer ── */
     footer {
       position: relative;
@@ -782,7 +681,7 @@
     /* ── Responsive ── */
     @media (max-width: 900px) {
       .works-grid { grid-template-columns: repeat(2, 1fr); }
-      .ranking-grid { grid-template-columns: repeat(3, 1fr); }
+      .ranking-grid { grid-template-columns: repeat(2, 1fr); }
     }
 
     @media (max-width: 768px) {
@@ -809,8 +708,7 @@
 
     @media (max-width: 480px) {
       .works-grid { grid-template-columns: 1fr; }
-      .ranking-grid { grid-template-columns: repeat(2, 1fr); }
-      .ranking-card { aspect-ratio: 3 / 2; }
+      .ranking-grid { grid-template-columns: 1fr; }
       .work-card-content { min-height: 130px; }
     }
   </style>
@@ -820,17 +718,13 @@
   <!-- Custom Cursor -->
   <div class="custom-cursor" id="custom-cursor"></div>
 
-  <!-- Scroll Progress Bar -->
-  <div class="scroll-progress" id="scroll-progress"></div>
-
   <!-- Navigation -->
   <nav id="nav">
-    <a href="#" class="nav-logo"><img src="logo.png" alt="AI STUDIO PAUL TOKYO"></a>
+    <a href="#hero" class="nav-logo"><img src="logo.png" alt="AI STUDIO PAUL TOKYO"></a>
     <div class="nav-links">
       <a href="#works">Works</a>
       <a href="#practice">Practice</a>
       <a href="#ranking">Ranking</a>
-      <a href="#status">Status</a>
     </div>
   </nav>
   <button class="nav-hamburger" id="nav-hamburger" aria-label="Menu">
@@ -892,13 +786,7 @@
     </div>
   </div>
 
-  <!-- Status Section -->
-  <section id="status">
-    <h2 class="section-title">Status</h2>
-    <div class="status-grid" id="status-grid"></div>
-  </section>
-
-  <footer>&copy; 2025 AI Studio Paul Tokyo</footer>
+  <footer>&copy; 2026 AI Studio Paul Tokyo</footer>
 
   <script>
   // ════════════════════════════════════════════════
@@ -1210,12 +1098,8 @@
   // Navigation — Scroll & Hamburger
   // ════════════════════════════════════════════════
   (function initNav() {
-    const nav = document.getElementById('nav');
     const hamburger = document.getElementById('nav-hamburger');
-
-    window.addEventListener('scroll', () => {
-      nav.classList.toggle('scrolled', window.scrollY > 50);
-    }, { passive: true });
+    const nav = document.getElementById('nav');
 
     hamburger.addEventListener('click', () => {
       hamburger.classList.toggle('open');
@@ -1232,16 +1116,6 @@
 
   // ════════════════════════════════════════════════
   // Scroll Progress Fallback
-  // ════════════════════════════════════════════════
-  (function initProgressFallback() {
-    if (CSS.supports && CSS.supports('animation-timeline', 'scroll()')) return;
-    const bar = document.getElementById('scroll-progress');
-    window.addEventListener('scroll', () => {
-      const max = document.documentElement.scrollHeight - window.innerHeight;
-      bar.style.transform = `scaleX(${max > 0 ? window.scrollY / max : 0})`;
-    }, { passive: true });
-  })();
-
   // ════════════════════════════════════════════════
   // Intersection Observer — Reveal Animations
   // ════════════════════════════════════════════════
@@ -1456,47 +1330,6 @@
   });
 
   // ════════════════════════════════════════════════
-  // Service Status
-  // ════════════════════════════════════════════════
-  (function initStatus() {
-    const services = [
-      { name: '生成新聞', url: 'https://and-and-and.com' },
-      { name: 'MY RANKING', url: 'https://my-ranking-api.hiroshinagano0113.workers.dev/rankings' },
-      { name: 'Studio Paul', url: 'https://paul13131313.github.io/studio-paul/' },
-      { name: 'SOUND COSMOS', url: 'https://paul13131313.github.io/sound-cosmos/' },
-      { name: 'SKILL GALAXY', url: 'https://paul13131313.github.io/skill-galaxy/' }
-    ];
-
-    const grid = document.getElementById('status-grid');
-    grid.innerHTML = services.map(s =>
-      `<div class="status-item"><div class="status-dot" data-url="${s.url}"></div>${s.name}</div>`
-    ).join('');
-
-    const dots = grid.querySelectorAll('.status-dot');
-    dots.forEach(dot => {
-      const url = dot.dataset.url;
-      fetch(url, { mode: 'no-cors', cache: 'no-cache' })
-        .then(() => { dot.classList.add('up'); })
-        .catch(() => { dot.classList.add('down'); });
-    });
-
-    // Observe status items for reveal
-    setTimeout(() => {
-      const items = document.querySelectorAll('.status-item');
-      const obs = new IntersectionObserver(entries => {
-        entries.forEach(entry => {
-          if (entry.isIntersecting) {
-            const idx = Array.from(items).indexOf(entry.target);
-            entry.target.style.transitionDelay = `${idx * 0.1}s`;
-            entry.target.classList.add('revealed');
-            obs.unobserve(entry.target);
-          }
-        });
-      }, { threshold: 0.1 });
-      items.forEach(i => obs.observe(i));
-    }, 50);
-  })();
-
   // ════════════════════════════════════════════════
   // Hero scroll fallback (non-scroll-timeline)
   // ════════════════════════════════════════════════
