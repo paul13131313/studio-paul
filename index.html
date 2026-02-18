@@ -221,25 +221,6 @@
       z-index: 0;
     }
 
-    #hero::after {
-      content: '';
-      position: absolute;
-      bottom: 0; left: 0;
-      width: 100%;
-      height: 45vh;
-      background: linear-gradient(to bottom, transparent 0%, rgba(10,10,15,0.4) 50%, var(--bg-primary) 100%);
-      z-index: 2;
-      pointer-events: none;
-    }
-
-    #works::before {
-      content: '';
-      display: block;
-      height: 8rem;
-      margin-top: -8rem;
-      background: linear-gradient(to bottom, rgba(10,10,15,0.85) 0%, var(--bg-primary) 100%);
-      pointer-events: none;
-    }
 
     .hero-typing {
       position: relative;
@@ -406,11 +387,13 @@
     /* ── Works Section ── */
     #works {
       padding: 6rem 0 4rem;
+      background: linear-gradient(to bottom, #1a1a24 0%, #111118 100%);
     }
 
     /* ── Practice Section ── */
     #practice {
       padding: 3rem 0 4rem;
+      background: linear-gradient(to bottom, #111118 0%, var(--bg-primary) 100%);
     }
 
     .works-grid {
@@ -999,8 +982,8 @@
       float edge=smoothstep(0.4, 0.15, d+n3*0.1);
       color=mix(color, brightBlue*0.7, edge*0.3*(1.0-blob));
 
-      float darkBlend=u_scroll;
-      vec3 darkBg=vec3(0.04, 0.04, 0.06);
+      float darkBlend=smoothstep(0.0, 0.5, u_scroll);
+      vec3 darkBg=vec3(0.102, 0.102, 0.141);
       color=mix(color, darkBg, darkBlend);
 
       fragColor=vec4(color,1.0);
@@ -1082,8 +1065,8 @@
       float edge=smoothstep(0.4, 0.15, d+n3*0.1);
       color=mix(color, brightBlue*0.7, edge*0.3*(1.0-blob));
 
-      float darkBlend=u_scroll;
-      vec3 darkBg=vec3(0.04, 0.04, 0.06);
+      float darkBlend=smoothstep(0.0, 0.5, u_scroll);
+      vec3 darkBg=vec3(0.102, 0.102, 0.141);
       color=mix(color, darkBg, darkBlend);
 
       gl_FragColor=vec4(color,1.0);
