@@ -215,7 +215,7 @@
     }
 
     #hero-canvas {
-      position: absolute;
+      position: fixed;
       top: 0; left: 0;
       width: 100%; height: 100%;
       z-index: 0;
@@ -233,7 +233,6 @@
       color: #ffffff;
       min-height: 1.2em;
       line-height: 1;
-      text-shadow: 0 2px 20px rgba(0, 0, 0, 0.3);
     }
 
     .typing-cursor {
@@ -374,6 +373,8 @@
 
     /* ── Section Divider ── */
     .section-divider {
+      position: relative;
+      z-index: 1;
       max-width: 1100px;
       margin: 0 auto;
       padding: 0 24px;
@@ -386,14 +387,16 @@
 
     /* ── Works Section ── */
     #works {
+      position: relative;
+      z-index: 1;
       padding: 6rem 0 4rem;
-      background: linear-gradient(to bottom, #1a1a24 0%, #111118 100%);
     }
 
     /* ── Practice Section ── */
     #practice {
+      position: relative;
+      z-index: 1;
       padding: 3rem 0 4rem;
-      background: linear-gradient(to bottom, #111118 0%, var(--bg-primary) 100%);
     }
 
     .works-grid {
@@ -519,6 +522,8 @@
 
     /* ── Ranking Section ── */
     #ranking {
+      position: relative;
+      z-index: 1;
       padding: 4rem 0 2rem;
     }
 
@@ -702,6 +707,8 @@
 
     /* ── Status Section ── */
     #status {
+      position: relative;
+      z-index: 1;
       padding: 4rem 0 2rem;
     }
 
@@ -761,6 +768,8 @@
 
     /* ── Footer ── */
     footer {
+      position: relative;
+      z-index: 1;
       text-align: center;
       padding: 3rem 2rem;
       font-family: 'Space Mono', monospace;
@@ -1118,17 +1127,11 @@
       my = 1.0 - e.clientY / window.innerHeight;
     });
     window.addEventListener('scroll', () => {
-      scrollProgress = Math.min(window.scrollY / window.innerHeight, 1.0);
+      scrollProgress = Math.min(window.scrollY / (window.innerHeight * 3), 1.0);
     }, { passive: true });
 
-    let heroVisible = true;
-    const heroObserver = new IntersectionObserver(entries => {
-      heroVisible = entries[0].isIntersecting;
-    }, { threshold: 0 });
-    heroObserver.observe(canvas);
-
     function resize() {
-      const dpr = Math.min(window.devicePixelRatio, 2) * 0.5; // half res for perf
+      const dpr = Math.min(window.devicePixelRatio, 2) * 0.5;
       canvas.width = canvas.clientWidth * dpr;
       canvas.height = canvas.clientHeight * dpr;
     }
@@ -1137,7 +1140,7 @@
 
     const start = performance.now();
     function frame() {
-      if (heroVisible) {
+      if (scrollProgress < 1.0) {
         gl.viewport(0, 0, canvas.width, canvas.height);
         gl.uniform1f(uTime, (performance.now() - start) / 1000);
         gl.uniform2f(uMouse, mx, my);
