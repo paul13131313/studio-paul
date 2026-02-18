@@ -114,10 +114,9 @@
       top: 0; left: 0;
       width: 100%;
       display: flex;
-      justify-content: center;
+      justify-content: space-between;
       align-items: center;
-      gap: 2.5rem;
-      padding: 1rem 2rem;
+      padding: 0.8rem 2rem;
       z-index: 9998;
       background: transparent;
       transition: background 0.3s, backdrop-filter 0.3s;
@@ -128,6 +127,29 @@
       backdrop-filter: blur(12px);
       -webkit-backdrop-filter: blur(12px);
       border-bottom: 1px solid rgba(255,255,255,0.05);
+    }
+
+    .nav-logo {
+      display: flex;
+      align-items: center;
+      flex-shrink: 0;
+    }
+
+    .nav-logo img {
+      height: 32px;
+      width: auto;
+      filter: drop-shadow(0 0 20px rgba(200, 169, 110, 0.15));
+      transition: filter 0.3s ease;
+    }
+
+    .nav-logo:hover img {
+      filter: drop-shadow(0 0 30px rgba(200, 169, 110, 0.3));
+    }
+
+    .nav-links {
+      display: flex;
+      gap: 2.5rem;
+      align-items: center;
     }
 
     nav a {
@@ -187,81 +209,6 @@
       top: 0; left: 0;
       width: 100%; height: 100%;
       z-index: 0;
-    }
-
-    .hero-content {
-      position: relative;
-      z-index: 1;
-    }
-
-    @supports (animation-timeline: scroll()) {
-      .hero-content {
-        animation: hero-exit linear both;
-        animation-timeline: scroll();
-        animation-range: 0% 30vh;
-      }
-    }
-
-    @keyframes hero-exit {
-      from {
-        opacity: 1;
-        transform: translateY(0) scale(1);
-        filter: blur(0px);
-      }
-      to {
-        opacity: 0;
-        transform: translateY(-80px) scale(0.95);
-        filter: blur(6px);
-      }
-    }
-
-    .logo-wrapper {
-      position: relative;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-    }
-
-    .logo-glow {
-      position: absolute;
-      top: 50%;
-      left: 50%;
-      transform: translate(-50%, -50%);
-      width: clamp(160px, 28vw, 280px);
-      height: clamp(160px, 28vw, 280px);
-      border-radius: 50%;
-      background: radial-gradient(circle, rgba(200, 169, 110, 0.12) 0%, rgba(200, 169, 110, 0.04) 40%, transparent 70%);
-      animation: glow-pulse 4s ease-in-out infinite;
-      pointer-events: none;
-    }
-
-    @keyframes glow-pulse {
-      0%, 100% { opacity: 0.6; transform: translate(-50%, -50%) scale(1); }
-      50% { opacity: 1; transform: translate(-50%, -50%) scale(1.15); }
-    }
-
-    .logo {
-      width: clamp(80px, 14vw, 120px);
-      margin-bottom: 1rem;
-      filter: drop-shadow(0 0 40px rgba(200, 169, 110, 0.2)) drop-shadow(0 0 80px rgba(200, 169, 110, 0.08));
-      transition: filter 0.6s ease;
-    }
-
-    .logo:hover {
-      filter: drop-shadow(0 0 50px rgba(200, 169, 110, 0.35)) drop-shadow(0 0 100px rgba(200, 169, 110, 0.15));
-    }
-
-    .hero-underline {
-      width: clamp(100px, 14vw, 140px);
-      height: 12px;
-      color: var(--gold-dim);
-      stroke-dasharray: 300;
-      stroke-dashoffset: 300;
-      animation: draw-line 1.8s ease-out 0.6s forwards;
-    }
-
-    @keyframes draw-line {
-      to { stroke-dashoffset: 0; }
     }
 
     .scroll-indicator {
@@ -788,16 +735,22 @@
     }
 
     @media (max-width: 768px) {
-      nav { display: none; }
-      nav.mobile-open {
+      .nav-links { display: none; }
+      nav.mobile-open .nav-links {
         display: flex;
         flex-direction: column;
+        position: fixed;
+        top: 0; left: 0;
+        width: 100%; height: 100vh;
         gap: 1.5rem;
-        padding: 4rem 2rem 2rem;
+        padding: 5rem 2rem 2rem;
         background: rgba(10, 10, 15, 0.95);
         backdrop-filter: blur(16px);
         -webkit-backdrop-filter: blur(16px);
+        align-items: center;
+        justify-content: center;
       }
+      .nav-logo img { height: 26px; }
       .nav-hamburger { display: flex; }
       body { cursor: auto; }
       .custom-cursor { display: none; }
@@ -821,10 +774,13 @@
 
   <!-- Navigation -->
   <nav id="nav">
-    <a href="#works">Works</a>
-    <a href="#practice">Practice</a>
-    <a href="#ranking">Ranking</a>
-    <a href="#status">Status</a>
+    <a href="#" class="nav-logo"><img src="logo.png" alt="AI STUDIO PAUL TOKYO"></a>
+    <div class="nav-links">
+      <a href="#works">Works</a>
+      <a href="#practice">Practice</a>
+      <a href="#ranking">Ranking</a>
+      <a href="#status">Status</a>
+    </div>
   </nav>
   <button class="nav-hamburger" id="nav-hamburger" aria-label="Menu">
     <span></span><span></span><span></span>
@@ -833,15 +789,6 @@
   <!-- Hero Section -->
   <section id="hero">
     <canvas id="hero-canvas"></canvas>
-    <div class="hero-content">
-      <div class="logo-wrapper">
-        <div class="logo-glow"></div>
-        <img src="logo.png" alt="AI STUDIO PAUL TOKYO" class="logo">
-        <svg class="hero-underline" viewBox="0 0 200 12" preserveAspectRatio="none">
-          <path d="M8 8 Q50 2, 100 6 T192 5" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
-        </svg>
-      </div>
-    </div>
     <div class="scroll-indicator">
       <span class="scroll-text">Scroll to explore</span>
       <span class="scroll-line"></span>
