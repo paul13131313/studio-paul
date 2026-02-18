@@ -1,0 +1,104 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <link href="https://fonts.googleapis.com/css2?family=Syne:wght@700;800&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body {
+      width: 1200px;
+      height: 630px;
+      overflow: hidden;
+      background: linear-gradient(135deg, #e8e8ec 0%, #c0cff0 25%, #3366cc 55%, #0a1a66 85%, #0a0a0f 100%);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      position: relative;
+    }
+
+    /* 動画パネル風のグリッド（装飾） */
+    .panels {
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      width: 70%;
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      grid-template-rows: auto auto;
+      gap: 10px;
+      opacity: 0.15;
+    }
+
+    .panel {
+      aspect-ratio: 16 / 10;
+      border-radius: 10px;
+      background: linear-gradient(135deg, rgba(255,255,255,0.15), rgba(255,255,255,0.03));
+      border: 1px solid rgba(255,255,255,0.1);
+    }
+
+    /* ロゴ */
+    .logo {
+      position: absolute;
+      top: 40px;
+      left: 50px;
+    }
+
+    .logo img {
+      height: 50px;
+      filter: invert(1);
+    }
+
+    /* メインテキスト */
+    .title {
+      font-family: 'Syne', sans-serif;
+      font-weight: 800;
+      font-size: 96px;
+      color: #ffffff;
+      text-transform: uppercase;
+      letter-spacing: -0.02em;
+      line-height: 1;
+      text-align: center;
+      z-index: 1;
+      text-shadow: 0 4px 40px rgba(0,0,0,0.3);
+    }
+
+    /* サブテキスト */
+    .subtitle {
+      font-family: 'Space Mono', monospace;
+      font-size: 16px;
+      letter-spacing: 0.3em;
+      text-transform: uppercase;
+      color: rgba(255,255,255,0.5);
+      margin-top: 24px;
+      z-index: 1;
+    }
+
+    /* 右下のURL */
+    .url {
+      position: absolute;
+      bottom: 35px;
+      right: 50px;
+      font-family: 'Space Mono', monospace;
+      font-size: 13px;
+      letter-spacing: 0.15em;
+      color: rgba(255,255,255,0.3);
+    }
+  </style>
+</head>
+<body>
+  <div class="logo"><img src="logo.png" alt=""></div>
+  <div class="panels">
+    <div class="panel"></div>
+    <div class="panel"></div>
+    <div class="panel"></div>
+    <div class="panel"></div>
+    <div class="panel"></div>
+    <div class="panel"></div>
+  </div>
+  <div class="title">AI STUDIO<br>PAUL</div>
+  <div class="subtitle">Portfolio — Tokyo</div>
+  <div class="url">paul13131313.github.io/studio-paul</div>
+</body>
+</html>
