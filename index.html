@@ -105,14 +105,23 @@
     }
 
     .nav-logo img {
-      height: 32px;
+      height: 40px;
       width: auto;
       filter: invert(1) drop-shadow(0 0 20px rgba(0, 0, 0, 0.1));
-      transition: filter 0.4s ease;
+      transition: filter 0.6s ease;
     }
 
     .nav-logo:hover img {
       filter: invert(1) drop-shadow(0 0 30px rgba(0, 0, 0, 0.2));
+    }
+
+    /* スクロール後：ロゴを白（invert解除）、リンクも白に */
+    nav.scrolled .nav-logo img {
+      filter: invert(0) drop-shadow(0 0 20px rgba(255, 255, 255, 0.1));
+    }
+
+    nav.scrolled .nav-logo:hover img {
+      filter: invert(0) drop-shadow(0 0 30px rgba(255, 255, 255, 0.2));
     }
 
     .nav-links {
@@ -128,11 +137,14 @@
       text-transform: uppercase;
       color: rgba(10, 10, 15, 0.5);
       text-decoration: none;
-      transition: color 0.4s;
+      transition: color 0.6s;
       cursor: none;
     }
 
     nav a:hover { color: rgba(10, 10, 15, 0.9); }
+
+    nav.scrolled a { color: rgba(255, 255, 255, 0.4); }
+    nav.scrolled a:hover { color: rgba(255, 255, 255, 0.9); }
 
     .nav-hamburger {
       display: none;
@@ -179,6 +191,32 @@
       z-index: 0;
     }
 
+    .video-panels {
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      width: 85%;
+      max-width: 1100px;
+      z-index: 1;
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      grid-template-rows: auto auto;
+      gap: 12px;
+      opacity: 0.3;
+    }
+
+    .video-panel {
+      border-radius: 12px;
+      overflow: hidden;
+      aspect-ratio: 16 / 10;
+    }
+
+    .video-panel canvas {
+      width: 100%;
+      height: 100%;
+      display: block;
+    }
 
     .hero-typing {
       position: relative;
@@ -468,72 +506,6 @@
       transform: translateX(0);
     }
 
-    .reel-card {
-      grid-column: 1 / -1;
-      aspect-ratio: auto;
-    }
-    .reel-thumb {
-      position: relative;
-      z-index: 2;
-      width: 100%;
-      aspect-ratio: 16 / 9;
-      overflow: hidden;
-      border-radius: 16px 16px 0 0;
-    }
-    .reel-thumb-img {
-      width: 100%;
-      height: 100%;
-      object-fit: cover;
-      transition: transform 0.4s ease;
-    }
-    .reel-card:hover .reel-thumb-img {
-      transform: scale(1.03);
-    }
-    .reel-play {
-      position: absolute;
-      top: 50%;
-      left: 50%;
-      transform: translate(-50%, -50%);
-      width: 64px;
-      height: 64px;
-      background: rgba(255, 255, 255, 0.15);
-      backdrop-filter: blur(8px);
-      border: 1px solid rgba(255, 255, 255, 0.25);
-      border-radius: 50%;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      font-size: 20px;
-      color: #fff;
-      transition: background 0.3s, transform 0.3s;
-    }
-    .reel-card:hover .reel-play {
-      background: rgba(255, 255, 255, 0.25);
-      transform: translate(-50%, -50%) scale(1.1);
-    }
-    .reel-player {
-      position: relative;
-      z-index: 2;
-      width: 100%;
-      aspect-ratio: 16 / 9;
-      overflow: hidden;
-      border-radius: 16px 16px 0 0;
-    }
-    .reel-iframe {
-      width: 100%;
-      height: 100%;
-      border: none;
-    }
-    .reel-label {
-      position: relative;
-      z-index: 2;
-      padding: 1rem 1.5rem;
-      font-family: 'Syne', sans-serif;
-      font-weight: 700;
-      font-size: clamp(0.9rem, 1.5vw, 1.1rem);
-      letter-spacing: 0.1em;
-      color: #fff;
-    }
 
     .works-loading {
       grid-column: 1 / -1;
@@ -752,6 +724,9 @@
     }
 
     @media (max-width: 768px) {
+      .video-panels { width: 90%; grid-template-columns: repeat(2, 1fr); grid-template-rows: repeat(2, 1fr); }
+      .video-panel:nth-child(5),
+      .video-panel:nth-child(6) { display: none; }
       .nav-links { display: none; }
       nav.mobile-open .nav-links {
         display: flex;
@@ -801,6 +776,14 @@
   <!-- Hero Section -->
   <section id="hero">
     <canvas id="hero-canvas"></canvas>
+    <div class="video-panels" id="video-panels">
+      <div class="video-panel"><canvas></canvas></div>
+      <div class="video-panel"><canvas></canvas></div>
+      <div class="video-panel"><canvas></canvas></div>
+      <div class="video-panel"><canvas></canvas></div>
+      <div class="video-panel"><canvas></canvas></div>
+      <div class="video-panel"><canvas></canvas></div>
+    </div>
     <div class="hero-typing">
       <span id="typing-text"></span><span class="typing-cursor"></span>
     </div>
@@ -1109,6 +1092,92 @@
   })();
 
   // ════════════════════════════════════════════════
+  // Video Panels — 1つの動画 → 6つのcanvasに異なるオフセットで描画
+  // ════════════════════════════════════════════════
+  (function initVideoPanels() {
+    const video = document.createElement('video');
+    video.src = 'reel2025.mp4';
+    video.muted = true;
+    video.loop = true;
+    video.playsInline = true;
+    video.preload = 'auto';
+
+    const canvases = document.querySelectorAll('.video-panel canvas');
+    if (!canvases.length) return;
+
+    // 各パネルのタイムオフセット（秒）
+    const offsets = [0, 4, 8, 12, 16, 20];
+    const ctxList = [];
+
+    canvases.forEach((c, i) => {
+      ctxList.push(c.getContext('2d'));
+    });
+
+    // canvasのピクセルサイズを実表示サイズに合わせる
+    function resizeAll() {
+      canvases.forEach(c => {
+        const rect = c.getBoundingClientRect();
+        if (rect.width > 0 && rect.height > 0) {
+          c.width = Math.round(rect.width);
+          c.height = Math.round(rect.height);
+        }
+      });
+    }
+    // 初回はDOMが安定してから
+    setTimeout(resizeAll, 100);
+    window.addEventListener('resize', resizeAll);
+
+    let duration = 0;
+
+    video.addEventListener('loadedmetadata', () => {
+      duration = video.duration;
+      video.play().catch(() => {});
+    });
+
+    // 描画ループ: 動画の現在時刻 + オフセットで各パネルの「仮想時刻」を計算
+    // 実際には1つの動画フレームを全パネルに描画するが、
+    // 各パネルを独立させるため、動画をシークする方式ではなく
+    // ソース動画のフレームを「切り取り位置をずらして」cover表示する
+    function drawLoop() {
+      if (video.readyState >= 2 && !video.paused) {
+        const vw = video.videoWidth;
+        const vh = video.videoHeight;
+
+        canvases.forEach((c, i) => {
+          if (c.width === 0 || c.height === 0) return;
+          const ctx = ctxList[i];
+          const cw = c.width;
+          const ch = c.height;
+
+          // object-fit: cover計算
+          const canvasRatio = cw / ch;
+          const videoRatio = vw / vh;
+          let sx, sy, sw, sh;
+
+          if (videoRatio > canvasRatio) {
+            sh = vh;
+            sw = vh * canvasRatio;
+            // パネルごとに水平の切り取り位置をずらす
+            const maxOffset = vw - sw;
+            sx = maxOffset * (i / (canvases.length - 1));
+            sy = 0;
+          } else {
+            sw = vw;
+            sh = vw / canvasRatio;
+            sx = 0;
+            // パネルごとに垂直の切り取り位置をずらす
+            const maxOffset = vh - sh;
+            sy = maxOffset * (i / (canvases.length - 1));
+          }
+
+          ctx.drawImage(video, sx, sy, sw, sh, 0, 0, cw, ch);
+        });
+      }
+      requestAnimationFrame(drawLoop);
+    }
+    drawLoop();
+  })();
+
   // Typing Animation
   // ════════════════════════════════════════════════
   (function initTyping() {
@@ -1179,6 +1248,16 @@
         nav.classList.remove('mobile-open');
       });
     });
+
+    // スクロールでロゴ・リンクの色を切り替え
+    const threshold = window.innerHeight * 0.4;
+    window.addEventListener('scroll', () => {
+      if (window.scrollY > threshold) {
+        nav.classList.add('scrolled');
+      } else {
+        nav.classList.remove('scrolled');
+      }
+    }, { passive: true });
   })();
 
   // ════════════════════════════════════════════════
@@ -1308,27 +1387,8 @@
       const worksItems = items.filter(i => i.category !== 'PRACTICE');
       const practiceItems = items.filter(i => i.category === 'PRACTICE');
 
-      const reelCard = `
-      <div class="work-card reel-card" style="--accent: #ff0033;" id="reel-card">
-        <div class="work-card-bg" style="background: linear-gradient(135deg, #0a0a0a, #1a1a2e);"></div>
-        <div class="reel-thumb" id="reel-thumb">
-          <img src="https://i.ytimg.com/vi/QBg2hO0E6vE/oar2.jpg" alt="SHOWREEL 2025" class="reel-thumb-img">
-          <div class="reel-play">▶</div>
-        </div>
-        <div class="reel-player" id="reel-player" style="display:none;">
-          <iframe src="" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen class="reel-iframe"></iframe>
-        </div>
-        <div class="reel-label">SHOWREEL 2025</div>
-      </div>`;
-      document.getElementById('works-grid').innerHTML = reelCard + renderCards(worksItems);
+      document.getElementById('works-grid').innerHTML = renderCards(worksItems);
       document.getElementById('practice-grid').innerHTML = renderCards(practiceItems);
-
-      document.getElementById('reel-thumb').addEventListener('click', function() {
-        this.style.display = 'none';
-        const player = document.getElementById('reel-player');
-        player.style.display = 'block';
-        player.querySelector('iframe').src = 'https://www.youtube.com/embed/QBg2hO0E6vE?autoplay=1&playsinline=1';
-      });
 
       initScrollReveal();
     })
