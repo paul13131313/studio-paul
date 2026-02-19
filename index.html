@@ -27,14 +27,14 @@
     *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
 
     :root {
-      --bg-primary: #0a0a0f;
+      --bg-primary: #000000;
       --bg-card: rgba(255,255,255,0.03);
       --text-primary: rgba(255,255,255,0.9);
       --text-secondary: rgba(255,255,255,0.5);
-      --gold: #c8a96e;
-      --gold-dim: rgba(200, 169, 110, 0.4);
-      --border: rgba(255,255,255,0.06);
-      --gradient-accent: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      --gold: #ffffff;
+      --gold-dim: rgba(255, 255, 255, 0.4);
+      --border: rgba(255,255,255,0.08);
+      --gradient-accent: linear-gradient(135deg, #333 0%, #111 100%);
     }
 
     html { scroll-behavior: smooth; }
@@ -107,21 +107,20 @@
     .nav-logo img {
       height: 40px;
       width: auto;
-      filter: invert(1) drop-shadow(0 0 20px rgba(0, 0, 0, 0.1));
+      filter: brightness(0) invert(1);
       transition: filter 0.6s ease;
     }
 
     .nav-logo:hover img {
-      filter: invert(1) drop-shadow(0 0 30px rgba(0, 0, 0, 0.2));
+      filter: brightness(0) invert(1) drop-shadow(0 0 30px rgba(255, 255, 255, 0.2));
     }
 
-    /* スクロール後：ロゴを白（invert解除）、リンクも白に */
     nav.scrolled .nav-logo img {
-      filter: invert(0) drop-shadow(0 0 20px rgba(255, 255, 255, 0.1));
+      filter: brightness(0) invert(1);
     }
 
     nav.scrolled .nav-logo:hover img {
-      filter: invert(0) drop-shadow(0 0 30px rgba(255, 255, 255, 0.2));
+      filter: brightness(0) invert(1) drop-shadow(0 0 30px rgba(255, 255, 255, 0.2));
     }
 
     .nav-links {
@@ -135,15 +134,15 @@
       font-size: 0.7rem;
       letter-spacing: 0.2em;
       text-transform: uppercase;
-      color: rgba(10, 10, 15, 0.5);
+      color: rgba(255, 255, 255, 0.5);
       text-decoration: none;
       transition: color 0.6s;
       cursor: none;
     }
 
-    nav a:hover { color: rgba(10, 10, 15, 0.9); }
+    nav a:hover { color: rgba(255, 255, 255, 0.9); }
 
-    nav.scrolled a { color: rgba(255, 255, 255, 0.4); }
+    nav.scrolled a { color: rgba(255, 255, 255, 0.5); }
     nav.scrolled a:hover { color: rgba(255, 255, 255, 0.9); }
 
     .nav-hamburger {
@@ -263,7 +262,7 @@
       font-size: 0.55rem;
       letter-spacing: 0.2em;
       text-transform: uppercase;
-      color: rgba(10, 10, 15, 0.4);
+      color: rgba(255, 255, 255, 0.4);
       opacity: 0;
       animation: fade-in-up 0.8s ease 1.5s forwards;
     }
@@ -272,7 +271,7 @@
       display: block;
       width: 1px;
       height: 32px;
-      background: linear-gradient(to bottom, rgba(10, 10, 15, 0.3), transparent);
+      background: linear-gradient(to bottom, rgba(255, 255, 255, 0.3), transparent);
       animation: scroll-line-grow 1.8s ease-in-out infinite;
       transform-origin: top;
     }
@@ -597,7 +596,7 @@
     }
 
     .ranking-modal {
-      background: #181818;
+      background: #0a0a0a;
       border: 1px solid rgba(255,255,255,0.08);
       border-radius: 20px;
       width: 90%;
@@ -684,9 +683,9 @@
       text-align: right;
     }
 
-    .ranking-item:nth-child(1) .ranking-num { color: #c9a84c; }
-    .ranking-item:nth-child(2) .ranking-num { color: #8a8a8a; }
-    .ranking-item:nth-child(3) .ranking-num { color: #9a6e3a; }
+    .ranking-item:nth-child(1) .ranking-num { color: #ffffff; }
+    .ranking-item:nth-child(2) .ranking-num { color: #cccccc; }
+    .ranking-item:nth-child(3) .ranking-num { color: #999999; }
 
     .ranking-item-title {
       font-family: 'Noto Sans JP', sans-serif;
@@ -736,7 +735,7 @@
         width: 100%; height: 100vh;
         gap: 1.5rem;
         padding: 5rem 2rem 2rem;
-        background: rgba(10, 10, 15, 0.95);
+        background: rgba(0, 0, 0, 0.95);
         backdrop-filter: blur(16px);
         -webkit-backdrop-filter: blur(16px);
         align-items: center;
@@ -845,7 +844,7 @@
   (function initHeroGL() {
     const canvas = document.getElementById('hero-canvas');
     const gl = canvas.getContext('webgl2') || canvas.getContext('webgl');
-    if (!gl) { canvas.style.background = '#0a0a0f'; return; }
+    if (!gl) { canvas.style.background = '#000000'; return; }
 
     const vertSrc = `#version 300 es
     in vec2 a_pos;
@@ -919,18 +918,18 @@
 
       float blob=smoothstep(0.45, 0.05, d+n3*0.1);
 
-      vec3 deepBlue=vec3(0.0, 0.05, 0.25);
-      vec3 brightBlue=vec3(0.0, 0.25, 0.95);
-      vec3 offWhite=vec3(0.92, 0.92, 0.93);
+      vec3 darkGray=vec3(0.08, 0.08, 0.08);
+      vec3 midGray=vec3(0.15, 0.15, 0.15);
+      vec3 black=vec3(0.0, 0.0, 0.0);
 
-      vec3 blobColor=mix(brightBlue, deepBlue, blob*0.8+n1*0.2);
-      vec3 color=mix(offWhite, blobColor, blob);
+      vec3 blobColor=mix(midGray, darkGray, blob*0.8+n1*0.2);
+      vec3 color=mix(black, blobColor, blob);
 
       float edge=smoothstep(0.4, 0.15, d+n3*0.1);
-      color=mix(color, brightBlue*0.7, edge*0.3*(1.0-blob));
+      color=mix(color, midGray*0.5, edge*0.3*(1.0-blob));
 
       float darkBlend=smoothstep(0.0, 0.5, u_scroll);
-      vec3 darkBg=vec3(0.102, 0.102, 0.141);
+      vec3 darkBg=vec3(0.0, 0.0, 0.0);
       color=mix(color, darkBg, darkBlend);
 
       fragColor=vec4(color,1.0);
@@ -1002,18 +1001,18 @@
 
       float blob=smoothstep(0.45, 0.05, d+n3*0.1);
 
-      vec3 deepBlue=vec3(0.0, 0.05, 0.25);
-      vec3 brightBlue=vec3(0.0, 0.25, 0.95);
-      vec3 offWhite=vec3(0.92, 0.92, 0.93);
+      vec3 darkGray=vec3(0.08, 0.08, 0.08);
+      vec3 midGray=vec3(0.15, 0.15, 0.15);
+      vec3 black=vec3(0.0, 0.0, 0.0);
 
-      vec3 blobColor=mix(brightBlue, deepBlue, blob*0.8+n1*0.2);
-      vec3 color=mix(offWhite, blobColor, blob);
+      vec3 blobColor=mix(midGray, darkGray, blob*0.8+n1*0.2);
+      vec3 color=mix(black, blobColor, blob);
 
       float edge=smoothstep(0.4, 0.15, d+n3*0.1);
-      color=mix(color, brightBlue*0.7, edge*0.3*(1.0-blob));
+      color=mix(color, midGray*0.5, edge*0.3*(1.0-blob));
 
       float darkBlend=smoothstep(0.0, 0.5, u_scroll);
-      vec3 darkBg=vec3(0.102, 0.102, 0.141);
+      vec3 darkBg=vec3(0.0, 0.0, 0.0);
       color=mix(color, darkBg, darkBlend);
 
       gl_FragColor=vec4(color,1.0);
@@ -1037,7 +1036,7 @@
 
     const vs = compile(gl.VERTEX_SHADER, isWebGL2 ? vertSrc : vertSrcV1);
     const fs = compile(gl.FRAGMENT_SHADER, isWebGL2 ? fragSrc : fragSrcV1);
-    if (!vs || !fs) { canvas.style.background = '#0a0a0f'; return; }
+    if (!vs || !fs) { canvas.style.background = '#000000'; return; }
 
     const prog = gl.createProgram();
     gl.attachShader(prog, vs);
