@@ -937,6 +937,13 @@
       document.getElementById('practice-grid').innerHTML = renderCards(practiceItems, lang);
       initScrollReveal();
     }
+
+    // ランキングカードを再描画
+    if (__rankingCategories) {
+      renderRankingCards(__rankingCategories, lang);
+      // reveal アニメーションを即適用
+      document.querySelectorAll('.ranking-card').forEach(c => c.classList.add('revealed'));
+    }
   }
 
   // トグルボタンのクリックイベント
@@ -1513,21 +1520,33 @@
   // ════════════════════════════════════════════════
   const RANKING_API = 'https://my-ranking-api.hiroshinagano0113.workers.dev';
 
+  let __rankingCategories = null;
+
+  function renderRankingCards(categories, lang) {
+    const grid = document.getElementById('ranking-grid');
+    grid.innerHTML = categories.map(c => {
+      const displayName = (lang === 'en' && c.name_en) ? c.name_en : c.name;
+      return `
+        <div class="ranking-card" data-id="${c.id}" data-name="${c.name}" data-name-en="${c.name_en || ''}" data-icon="${c.icon}">
+          <div class="ranking-card-icon">${c.icon}</div>
+          <div class="ranking-card-name">${displayName}</div>
+        </div>
+      `;
+    }).join('');
+  }
+
   fetch(`${RANKING_API}/rankings`)
     .then(r => r.json())
     .then(categories => {
-      const grid = document.getElementById('ranking-grid');
-      grid.innerHTML = categories.map(c => `
-        <div class="ranking-card" data-id="${c.id}" data-name="${c.name}" data-icon="${c.icon}">
-          <div class="ranking-card-icon">${c.icon}</div>
-          <div class="ranking-card-name">${c.name}</div>
-        </div>
-      `).join('');
+      __rankingCategories = categories;
+      renderRankingCards(categories, currentLang);
 
+      const grid = document.getElementById('ranking-grid');
       grid.addEventListener('click', e => {
         const card = e.target.closest('.ranking-card');
         if (!card) return;
-        openRanking(card.dataset.id, card.dataset.icon, card.dataset.name);
+        const displayName = (currentLang === 'en' && card.dataset.nameEn) ? card.dataset.nameEn : card.dataset.name;
+        openRanking(card.dataset.id, card.dataset.icon, displayName);
       });
 
       // Trigger reveal for ranking cards after they're loaded
@@ -1565,12 +1584,15 @@
           list.innerHTML = '<div class="ranking-loading">No items</div>';
           return;
         }
-        list.innerHTML = items.map(item => `
+        list.innerHTML = items.map(item => {
+          const displayTitle = (currentLang === 'en' && item.title_en) ? item.title_en : item.title;
+          return `
           <li class="ranking-item">
             <div class="ranking-num">${item.rank}</div>
-            <div class="ranking-item-title">${item.title}</div>
+            <div class="ranking-item-title">${displayTitle}</div>
           </li>
-        `).join('');
+          `;
+        }).join('');
       })
       .catch(() => {
         list.innerHTML = '<div class="ranking-loading">Failed to load</div>';
