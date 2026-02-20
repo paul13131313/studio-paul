@@ -551,194 +551,6 @@
       color: var(--text-secondary);
     }
 
-    /* ── Ranking Section ── */
-    #ranking {
-      position: relative;
-      z-index: 1;
-      padding: 4rem 0 2rem;
-      background: #000000;
-    }
-
-    .ranking-grid {
-      display: grid;
-      grid-template-columns: repeat(3, 1fr);
-      gap: 20px;
-      max-width: 1100px;
-      margin: 0 auto;
-      padding: 0 24px;
-    }
-
-    .ranking-card {
-      background: var(--bg-card);
-      border: 1px solid var(--border);
-      border-radius: 16px;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      justify-content: center;
-      padding: 2rem 1rem;
-      cursor: none;
-      transition: border-color 0.3s, transform 0.3s;
-      text-align: center;
-      min-height: 160px;
-      opacity: 0;
-      transform: translateY(30px);
-    }
-
-    .ranking-card.revealed {
-      opacity: 1;
-      transform: translateY(0);
-      transition: opacity 0.6s ease, transform 0.6s cubic-bezier(0.16, 1, 0.3, 1), border-color 0.3s;
-    }
-
-    .ranking-card:hover {
-      border-color: rgba(255,255,255,0.15);
-    }
-
-    .ranking-card-icon {
-      font-size: clamp(1.8rem, 3.5vw, 3rem);
-      margin-bottom: 0.6rem;
-      line-height: 1;
-    }
-
-    .ranking-card-name {
-      font-family: 'Noto Sans JP', sans-serif;
-      font-weight: 700;
-      font-size: clamp(0.7rem, 1.4vw, 1.1rem);
-      color: var(--text-primary);
-      letter-spacing: 0.04em;
-    }
-
-    /* ── Ranking Modal ── */
-    .ranking-overlay {
-      position: fixed;
-      top: 0; left: 0;
-      width: 100%; height: 100%;
-      background: rgba(0, 0, 0, 0.7);
-      backdrop-filter: blur(16px);
-      -webkit-backdrop-filter: blur(16px);
-      z-index: 5000;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      opacity: 0;
-      visibility: hidden;
-      transition: opacity 0.35s, visibility 0.35s;
-    }
-
-    .ranking-overlay.active {
-      opacity: 1;
-      visibility: visible;
-    }
-
-    .ranking-modal {
-      background: #0a0a0a;
-      border: 1px solid rgba(255,255,255,0.08);
-      border-radius: 20px;
-      width: 90%;
-      max-width: 480px;
-      max-height: 80vh;
-      overflow-y: auto;
-      position: relative;
-      animation: modal-enter 0.3s cubic-bezier(0.16, 1, 0.3, 1);
-    }
-
-    .ranking-overlay:not(.active) .ranking-modal {
-      animation: none;
-      transform: translateY(20px) scale(0.95);
-      opacity: 0;
-    }
-
-    .ranking-overlay.active .ranking-modal {
-      transform: translateY(0) scale(1);
-      opacity: 1;
-    }
-
-    @keyframes modal-enter {
-      from {
-        opacity: 0;
-        transform: translateY(20px) scale(0.95);
-      }
-      to {
-        opacity: 1;
-        transform: translateY(0) scale(1);
-      }
-    }
-
-    .ranking-modal-header {
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      padding: 1.5rem 1.8rem;
-      border-bottom: 1px solid rgba(255,255,255,0.06);
-    }
-
-    .ranking-modal-title {
-      font-family: 'Noto Sans JP', sans-serif;
-      font-weight: 700;
-      font-size: clamp(1rem, 2vw, 1.4rem);
-      color: var(--text-primary);
-    }
-
-    .ranking-modal-title span { margin-right: 0.5rem; }
-
-    .ranking-modal-close {
-      background: none;
-      border: none;
-      color: var(--text-secondary);
-      font-size: 1.4rem;
-      cursor: none;
-      padding: 0.2rem;
-      line-height: 1;
-      transition: color 0.2s;
-    }
-
-    .ranking-modal-close:hover { color: var(--text-primary); }
-
-    .ranking-list {
-      list-style: none;
-      padding: 0.5rem 0;
-    }
-
-    .ranking-item {
-      display: flex;
-      align-items: center;
-      padding: 0.9rem 1.8rem;
-      gap: 1rem;
-      transition: background 0.2s;
-    }
-
-    .ranking-item:hover { background: rgba(255,255,255,0.03); }
-
-    .ranking-num {
-      font-family: 'Orbitron', monospace;
-      font-weight: 700;
-      font-size: clamp(0.85rem, 1.5vw, 1.1rem);
-      color: var(--text-secondary);
-      min-width: 2rem;
-      text-align: right;
-    }
-
-    .ranking-item:nth-child(1) .ranking-num { color: #ffffff; }
-    .ranking-item:nth-child(2) .ranking-num { color: #cccccc; }
-    .ranking-item:nth-child(3) .ranking-num { color: #999999; }
-
-    .ranking-item-title {
-      font-family: 'Noto Sans JP', sans-serif;
-      font-weight: 400;
-      font-size: clamp(0.8rem, 1.4vw, 1rem);
-      color: var(--text-primary);
-    }
-
-    .ranking-loading {
-      text-align: center;
-      padding: 3rem;
-      font-family: 'Space Mono', monospace;
-      font-size: 0.7rem;
-      letter-spacing: 0.2em;
-      color: var(--text-secondary);
-    }
-
     /* ── Footer ── */
     footer {
       position: relative;
@@ -756,7 +568,6 @@
     /* ── Responsive ── */
     @media (max-width: 900px) {
       .works-grid { grid-template-columns: repeat(2, 1fr); }
-      .ranking-grid { grid-template-columns: repeat(2, 1fr); }
     }
 
     @media (max-width: 768px) {
@@ -787,7 +598,6 @@
 
     @media (max-width: 480px) {
       .works-grid { grid-template-columns: 1fr; }
-      .ranking-grid { grid-template-columns: 1fr; }
       .work-card-content { min-height: 130px; }
     }
   </style>
@@ -803,7 +613,6 @@
     <div class="nav-links">
       <a href="#works">Works</a>
       <a href="#practice">Practice</a>
-      <a href="#ranking">Ranking</a>
       <button class="lang-toggle" id="lang-toggle" aria-label="Switch language">
         <span class="lang-jp lang-active">JP</span><span class="lang-sep">/</span><span class="lang-en">EN</span>
       </button>
@@ -856,25 +665,6 @@
       <div class="works-loading">Loading...</div>
     </div>
   </section>
-
-  <!-- Ranking Section -->
-  <section id="ranking">
-    <h2 class="section-title">Ranking</h2>
-    <div class="ranking-grid" id="ranking-grid">
-      <div class="ranking-loading">Loading...</div>
-    </div>
-  </section>
-
-  <!-- Ranking Modal -->
-  <div class="ranking-overlay" id="ranking-overlay">
-    <div class="ranking-modal">
-      <div class="ranking-modal-header">
-        <div class="ranking-modal-title" id="ranking-modal-title"></div>
-        <button class="ranking-modal-close" id="ranking-close">&times;</button>
-      </div>
-      <ul class="ranking-list" id="ranking-list"></ul>
-    </div>
-  </div>
 
   <footer>&copy; 2026 AI Studio Paul Tokyo</footer>
 
@@ -938,12 +728,6 @@
       initScrollReveal();
     }
 
-    // ランキングカードを再描画
-    if (__rankingCategories) {
-      renderRankingCards(__rankingCategories, lang);
-      // reveal アニメーションを即適用
-      document.querySelectorAll('.ranking-card').forEach(c => c.classList.add('revealed'));
-    }
   }
 
   // トグルボタンのクリックイベント
@@ -1333,11 +1117,11 @@
     });
 
     document.addEventListener('mouseover', e => {
-      const t = e.target.closest('a, button, .ranking-card, .work-card');
+      const t = e.target.closest('a, button, .work-card');
       if (t) cursor.classList.add('hover');
     });
     document.addEventListener('mouseout', e => {
-      const t = e.target.closest('a, button, .ranking-card, .work-card');
+      const t = e.target.closest('a, button, .work-card');
       if (t) cursor.classList.remove('hover');
     });
   })();
@@ -1413,20 +1197,6 @@
       });
     }, { threshold: 0.1 });
     cards.forEach(c => cardObs.observe(c));
-
-    // Ranking cards
-    const rankCards = document.querySelectorAll('.ranking-card');
-    const rankObs = new IntersectionObserver(entries => {
-      entries.forEach(entry => {
-        if (entry.isIntersecting) {
-          const idx = Array.from(rankCards).indexOf(entry.target);
-          entry.target.style.transitionDelay = `${idx * 0.08}s`;
-          entry.target.classList.add('revealed');
-          rankObs.unobserve(entry.target);
-        }
-      });
-    }, { threshold: 0.1 });
-    rankCards.forEach(c => rankObs.observe(c));
 
     // Status items
     const statusItems = document.querySelectorAll('.status-item');
@@ -1515,100 +1285,6 @@
       document.getElementById('practice-grid').innerHTML = '<div class="works-loading">Failed to load</div>';
     });
 
-  // ════════════════════════════════════════════════
-  // MY RANKING — API
-  // ════════════════════════════════════════════════
-  const RANKING_API = 'https://my-ranking-api.hiroshinagano0113.workers.dev';
-
-  let __rankingCategories = null;
-
-  function renderRankingCards(categories, lang) {
-    const grid = document.getElementById('ranking-grid');
-    grid.innerHTML = categories.map(c => {
-      const displayName = (lang === 'en' && c.name_en) ? c.name_en : c.name;
-      return `
-        <div class="ranking-card" data-id="${c.id}" data-name="${c.name}" data-name-en="${c.name_en || ''}" data-icon="${c.icon}">
-          <div class="ranking-card-icon">${c.icon}</div>
-          <div class="ranking-card-name">${displayName}</div>
-        </div>
-      `;
-    }).join('');
-  }
-
-  fetch(`${RANKING_API}/rankings`)
-    .then(r => r.json())
-    .then(categories => {
-      __rankingCategories = categories;
-      renderRankingCards(categories, currentLang);
-
-      const grid = document.getElementById('ranking-grid');
-      grid.addEventListener('click', e => {
-        const card = e.target.closest('.ranking-card');
-        if (!card) return;
-        const displayName = (currentLang === 'en' && card.dataset.nameEn) ? card.dataset.nameEn : card.dataset.name;
-        openRanking(card.dataset.id, card.dataset.icon, displayName);
-      });
-
-      // Trigger reveal for ranking cards after they're loaded
-      setTimeout(() => {
-        const rankCards = document.querySelectorAll('.ranking-card');
-        const rankObs = new IntersectionObserver(entries => {
-          entries.forEach(entry => {
-            if (entry.isIntersecting) {
-              const idx = Array.from(rankCards).indexOf(entry.target);
-              entry.target.style.transitionDelay = `${idx * 0.08}s`;
-              entry.target.classList.add('revealed');
-              rankObs.unobserve(entry.target);
-            }
-          });
-        }, { threshold: 0.1 });
-        rankCards.forEach(c => rankObs.observe(c));
-      }, 50);
-    })
-    .catch(() => {
-      document.getElementById('ranking-grid').innerHTML = '<div class="ranking-loading">Failed to load</div>';
-    });
-
-  function openRanking(id, icon, name) {
-    const overlay = document.getElementById('ranking-overlay');
-    const list = document.getElementById('ranking-list');
-    const title = document.getElementById('ranking-modal-title');
-    title.innerHTML = `<span>${icon}</span>${name}`;
-    list.innerHTML = '<div class="ranking-loading">Loading...</div>';
-    overlay.classList.add('active');
-
-    fetch(`${RANKING_API}/rankings/${id}`)
-      .then(r => r.json())
-      .then(items => {
-        if (!items.length) {
-          list.innerHTML = '<div class="ranking-loading">No items</div>';
-          return;
-        }
-        list.innerHTML = items.map(item => {
-          const displayTitle = (currentLang === 'en' && item.title_en) ? item.title_en : item.title;
-          return `
-          <li class="ranking-item">
-            <div class="ranking-num">${item.rank}</div>
-            <div class="ranking-item-title">${displayTitle}</div>
-          </li>
-          `;
-        }).join('');
-      })
-      .catch(() => {
-        list.innerHTML = '<div class="ranking-loading">Failed to load</div>';
-      });
-  }
-
-  document.getElementById('ranking-close').addEventListener('click', () => {
-    document.getElementById('ranking-overlay').classList.remove('active');
-  });
-  document.getElementById('ranking-overlay').addEventListener('click', e => {
-    if (e.target === e.currentTarget) {
-      e.currentTarget.classList.remove('active');
-    }
-  });
-
-  // ════════════════════════════════════════════════
   // ════════════════════════════════════════════════
   // Hero scroll fallback (non-scroll-timeline)
   // ════════════════════════════════════════════════
