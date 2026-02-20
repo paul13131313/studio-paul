@@ -147,20 +147,35 @@
 
     .lang-toggle {
       background: none;
-      border: 1px solid rgba(255, 255, 255, 0.2);
+      border: 1px solid rgba(255, 255, 255, 0.15);
       border-radius: 4px;
-      padding: 0.25rem 0.6rem;
+      padding: 0.25rem 0.5rem;
       font-family: 'Space Mono', monospace;
       font-size: 0.6rem;
-      letter-spacing: 0.15em;
+      letter-spacing: 0.1em;
       color: rgba(255, 255, 255, 0.5);
       cursor: none;
-      transition: color 0.3s, border-color 0.3s;
-      text-transform: uppercase;
+      transition: border-color 0.3s;
+      display: flex;
+      align-items: center;
+      gap: 0;
     }
     .lang-toggle:hover {
-      color: rgba(255, 255, 255, 0.9);
-      border-color: rgba(255, 255, 255, 0.4);
+      border-color: rgba(255, 255, 255, 0.35);
+    }
+    .lang-toggle .lang-jp,
+    .lang-toggle .lang-en {
+      padding: 0.1rem 0.3rem;
+      transition: color 0.3s, opacity 0.3s;
+      opacity: 0.35;
+    }
+    .lang-toggle .lang-sep {
+      opacity: 0.2;
+      padding: 0 0.1rem;
+    }
+    .lang-toggle .lang-active {
+      opacity: 1;
+      color: rgba(255, 255, 255, 0.95);
     }
 
     .nav-hamburger {
@@ -789,7 +804,9 @@
       <a href="#works">Works</a>
       <a href="#practice">Practice</a>
       <a href="#ranking">Ranking</a>
-      <button class="lang-toggle" id="lang-toggle" aria-label="Switch language">EN</button>
+      <button class="lang-toggle" id="lang-toggle" aria-label="Switch language">
+        <span class="lang-jp lang-active">JP</span><span class="lang-sep">/</span><span class="lang-en">EN</span>
+      </button>
     </div>
   </nav>
   <button class="nav-hamburger" id="nav-hamburger" aria-label="Menu">
@@ -904,9 +921,13 @@
     if (ogDesc) ogDesc.setAttribute('content', translations[lang].og_description);
     if (twDesc) twDesc.setAttribute('content', translations[lang].og_description);
 
-    // トグルボタンのラベルを更新（切り替え先の言語名を表示）
-    const toggle = document.getElementById('lang-toggle');
-    if (toggle) toggle.textContent = lang === 'ja' ? 'EN' : 'JP';
+    // トグルボタンのアクティブ表示を更新
+    const jpLabel = document.querySelector('.lang-jp');
+    const enLabel = document.querySelector('.lang-en');
+    if (jpLabel && enLabel) {
+      jpLabel.classList.toggle('lang-active', lang === 'ja');
+      enLabel.classList.toggle('lang-active', lang === 'en');
+    }
 
     // カードを再描画
     if (__sheetItems) {
@@ -1442,7 +1463,8 @@
         bg:       cols[5] || 'linear-gradient(135deg, #2a2a2a 0%, #1a1a1a 100%)',
         color:    cols[6] || '#e8e0d0',
         font:     cols[7] || 'ja',
-        desc_en:  cols[8] || ''
+        desc_en:  cols[8] || '',
+        title_en: cols[9] || ''
       });
     }
     return rows;
@@ -1450,15 +1472,18 @@
 
   function renderCards(items, lang) {
     return items.map(item => {
-      const titleClass = (item.font && item.font.toLowerCase() !== 'ja') ? 'work-title-en' : 'work-title';
+      const title = (lang === 'en' && item.title_en) ? item.title_en : item.title;
       const desc = (lang === 'en' && item.desc_en) ? item.desc_en : item.desc;
+      // EN時は英語タイトルなので英語フォント、JA時は元のfont設定に従う
+      const useEnFont = (lang === 'en' && item.title_en) || (item.font && item.font.toLowerCase() !== 'ja');
+      const titleClass = useEnFont ? 'work-title-en' : 'work-title';
       return `
       <a href="${item.url}" target="_blank" rel="noopener" class="work-card" style="--accent: ${item.color};">
         <div class="work-card-bg" style="background: ${item.bg};"></div>
         <div class="work-card-shine"></div>
         <div class="work-card-content">
           <div class="work-emoji">${item.emoji}</div>
-          <div class="${titleClass}" style="color: ${item.color};">${item.title}</div>
+          <div class="${titleClass}" style="color: ${item.color};">${title}</div>
           <div class="work-desc" style="color: ${item.color};">${desc}</div>
         </div>
         <div class="work-arrow" style="color: ${item.color};">→</div>
