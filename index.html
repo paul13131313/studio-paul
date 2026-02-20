@@ -145,6 +145,24 @@
     nav.scrolled a { color: rgba(255, 255, 255, 0.5); }
     nav.scrolled a:hover { color: rgba(255, 255, 255, 0.9); }
 
+    .lang-toggle {
+      background: none;
+      border: 1px solid rgba(255, 255, 255, 0.2);
+      border-radius: 4px;
+      padding: 0.25rem 0.6rem;
+      font-family: 'Space Mono', monospace;
+      font-size: 0.6rem;
+      letter-spacing: 0.15em;
+      color: rgba(255, 255, 255, 0.5);
+      cursor: none;
+      transition: color 0.3s, border-color 0.3s;
+      text-transform: uppercase;
+    }
+    .lang-toggle:hover {
+      color: rgba(255, 255, 255, 0.9);
+      border-color: rgba(255, 255, 255, 0.4);
+    }
+
     .nav-hamburger {
       display: none;
       background: none;
@@ -749,6 +767,7 @@
       .nav-hamburger { display: flex; }
       body { cursor: auto; }
       .custom-cursor { display: none; }
+      .lang-toggle { cursor: pointer; }
     }
 
     @media (max-width: 480px) {
@@ -770,6 +789,7 @@
       <a href="#works">Works</a>
       <a href="#practice">Practice</a>
       <a href="#ranking">Ranking</a>
+      <button class="lang-toggle" id="lang-toggle" aria-label="Switch language">EN</button>
     </div>
   </nav>
   <button class="nav-hamburger" id="nav-hamburger" aria-label="Menu">
@@ -799,12 +819,12 @@
   <!-- Works Section -->
   <section id="works">
     <h2 class="section-title">Works</h2>
-    <p class="section-desc">制作実績</p>
+    <p class="section-desc" data-i18n="works_subtitle">制作実績</p>
     <div class="works-grid" id="works-grid">
       <div class="works-loading">Loading...</div>
     </div>
     <a href="https://docs.google.com/presentation/d/1z--3WagTBVek8H2nULYDAg5Yhd4iFYNesW1fVS4QtFU/edit?usp=sharing" target="_blank" rel="noopener" class="other-works-link">
-      AI以外の制作実績はこちら →
+      <span data-i18n="other_works_link">AI以外の制作実績はこちら →</span>
     </a>
   </section>
 
@@ -814,7 +834,7 @@
   <!-- Practice Section -->
   <section id="practice">
     <h2 class="section-title">Practice</h2>
-    <p class="section-desc">スキル習得のための実験・練習</p>
+    <p class="section-desc" data-i18n="practice_subtitle">スキル習得のための実験・練習</p>
     <div class="works-grid" id="practice-grid">
       <div class="works-loading">Loading...</div>
     </div>
@@ -842,6 +862,67 @@
   <footer>&copy; 2026 AI Studio Paul Tokyo</footer>
 
   <script>
+  // ════════════════════════════════════════════════
+  // i18n — Language Switching
+  // ════════════════════════════════════════════════
+  const translations = {
+    ja: {
+      works_subtitle: '制作実績',
+      practice_subtitle: 'スキル習得のための実験・練習',
+      other_works_link: 'AI以外の制作実績はこちら →',
+      og_description: 'AI Studio Paul Tokyo — ポートフォリオ'
+    },
+    en: {
+      works_subtitle: 'Production Results',
+      practice_subtitle: 'Experiments & Practice',
+      other_works_link: 'Non-AI works here →',
+      og_description: 'AI Studio Paul Tokyo — Portfolio'
+    }
+  };
+
+  let currentLang = localStorage.getItem('studio-paul-lang') || 'ja';
+  let __sheetItems = null;
+
+  function setLanguage(lang) {
+    currentLang = lang;
+    localStorage.setItem('studio-paul-lang', lang);
+
+    // <html lang> を更新
+    document.documentElement.lang = lang;
+
+    // data-i18n 要素のテキストを切り替え
+    document.querySelectorAll('[data-i18n]').forEach(el => {
+      const key = el.getAttribute('data-i18n');
+      if (translations[lang] && translations[lang][key]) {
+        el.textContent = translations[lang][key];
+      }
+    });
+
+    // OGP メタタグを更新
+    const ogDesc = document.querySelector('meta[property="og:description"]');
+    const twDesc = document.querySelector('meta[name="twitter:description"]');
+    if (ogDesc) ogDesc.setAttribute('content', translations[lang].og_description);
+    if (twDesc) twDesc.setAttribute('content', translations[lang].og_description);
+
+    // トグルボタンのラベルを更新（切り替え先の言語名を表示）
+    const toggle = document.getElementById('lang-toggle');
+    if (toggle) toggle.textContent = lang === 'ja' ? 'EN' : 'JP';
+
+    // カードを再描画
+    if (__sheetItems) {
+      const worksItems = __sheetItems.filter(i => i.category !== 'PRACTICE');
+      const practiceItems = __sheetItems.filter(i => i.category === 'PRACTICE');
+      document.getElementById('works-grid').innerHTML = renderCards(worksItems, lang);
+      document.getElementById('practice-grid').innerHTML = renderCards(practiceItems, lang);
+      initScrollReveal();
+    }
+  }
+
+  // トグルボタンのクリックイベント
+  document.getElementById('lang-toggle').addEventListener('click', () => {
+    setLanguage(currentLang === 'ja' ? 'en' : 'ja');
+  });
+
   // ════════════════════════════════════════════════
   // WebGL Hero Background — Simplex Noise Shader
   // ════════════════════════════════════════════════
@@ -1360,15 +1441,17 @@
         emoji:    cols[4] || '🔗',
         bg:       cols[5] || 'linear-gradient(135deg, #2a2a2a 0%, #1a1a1a 100%)',
         color:    cols[6] || '#e8e0d0',
-        font:     cols[7] || 'ja'
+        font:     cols[7] || 'ja',
+        desc_en:  cols[8] || ''
       });
     }
     return rows;
   }
 
-  function renderCards(items) {
+  function renderCards(items, lang) {
     return items.map(item => {
       const titleClass = (item.font && item.font.toLowerCase() !== 'ja') ? 'work-title-en' : 'work-title';
+      const desc = (lang === 'en' && item.desc_en) ? item.desc_en : item.desc;
       return `
       <a href="${item.url}" target="_blank" rel="noopener" class="work-card" style="--accent: ${item.color};">
         <div class="work-card-bg" style="background: ${item.bg};"></div>
@@ -1376,7 +1459,7 @@
         <div class="work-card-content">
           <div class="work-emoji">${item.emoji}</div>
           <div class="${titleClass}" style="color: ${item.color};">${item.title}</div>
-          <div class="work-desc" style="color: ${item.color};">${item.desc}</div>
+          <div class="work-desc" style="color: ${item.color};">${desc}</div>
         </div>
         <div class="work-arrow" style="color: ${item.color};">→</div>
       </a>`;
@@ -1386,12 +1469,12 @@
   fetch(SHEET_CSV)
     .then(r => r.text())
     .then(text => {
-      const items = parseCSV(text);
-      const worksItems = items.filter(i => i.category !== 'PRACTICE');
-      const practiceItems = items.filter(i => i.category === 'PRACTICE');
+      __sheetItems = parseCSV(text);
+      const worksItems = __sheetItems.filter(i => i.category !== 'PRACTICE');
+      const practiceItems = __sheetItems.filter(i => i.category === 'PRACTICE');
 
-      document.getElementById('works-grid').innerHTML = renderCards(worksItems);
-      document.getElementById('practice-grid').innerHTML = renderCards(practiceItems);
+      document.getElementById('works-grid').innerHTML = renderCards(worksItems, currentLang);
+      document.getElementById('practice-grid').innerHTML = renderCards(practiceItems, currentLang);
 
       initScrollReveal();
     })
@@ -1492,6 +1575,9 @@
       content.style.filter = `blur(${6 * t}px)`;
     }, { passive: true });
   })();
+
+  // 保存された言語設定を適用
+  setLanguage(currentLang);
   </script>
 </body>
 </html>
