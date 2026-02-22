@@ -267,13 +267,6 @@
       line-height: 1;
       pointer-events: none;
     }
-    .hero-role-prefix {
-      opacity: 0.4;
-      font-size: 0.5em;
-      letter-spacing: 0.05em;
-      margin-right: 0.3em;
-      vertical-align: baseline;
-    }
     .role-cursor {
       display: inline-block;
       width: clamp(3px, 0.5vw, 6px);
@@ -644,7 +637,7 @@
       <div class="video-panel"><canvas></canvas></div>
     </div>
     <div class="hero-role">
-      <span class="hero-role-prefix">role:</span><span id="role-text"></span><span class="role-cursor"></span>
+      <span id="role-text"></span><span class="role-cursor"></span>
     </div>
     <div class="scroll-indicator">
       <span class="scroll-text">Scroll to explore</span>
@@ -1087,7 +1080,7 @@
   // Typing Animation — role: 肩書き
   // ════════════════════════════════════════════════
   (function initRoleTyping() {
-    const WORDS = ['CREATIVE DIRECTOR', 'PLANNER', 'COPYWRITER', 'WEB DEVELOPER', 'AI CREATOR'];
+    const WORDS = ['CREATIVE DIRECTOR', 'PLANNER', 'COPYWRITER', 'WEB DEVELOPER'];
     const el = document.getElementById('role-text');
     let wordIdx = 0, charIdx = 0, deleting = false;
 
