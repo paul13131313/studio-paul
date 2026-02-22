@@ -250,25 +250,42 @@
       display: block;
     }
 
-    /* ── Code Flood ── */
-    .hero-typing {
-      position: absolute !important;
-      inset: 0;
-      padding: 60px;
-      overflow: hidden;
-      display: block;
-      z-index: 2;
-      text-align: left;
-    }
-    #code-flood-text {
+    /* ── Role Typing (center overlay) ── */
+    .hero-role {
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      z-index: 3;
       font-family: 'Syne', sans-serif;
-      font-size: 42px;
       font-weight: 800;
-      line-height: 1.35;
-      color: rgba(255, 255, 255, 0.88);
-      word-break: break-all;
-      white-space: normal;
+      font-size: clamp(2.5rem, 8vw, 7rem);
       letter-spacing: -0.02em;
+      text-transform: uppercase;
+      color: #ffffff;
+      white-space: nowrap;
+      line-height: 1;
+      pointer-events: none;
+    }
+    .hero-role-prefix {
+      opacity: 0.4;
+      font-size: 0.5em;
+      letter-spacing: 0.05em;
+      margin-right: 0.3em;
+      vertical-align: baseline;
+    }
+    .role-cursor {
+      display: inline-block;
+      width: clamp(3px, 0.5vw, 6px);
+      height: 0.85em;
+      background: #ffffff;
+      margin-left: 0.05em;
+      animation: role-blink 0.5s step-end infinite;
+      vertical-align: text-bottom;
+    }
+    @keyframes role-blink {
+      0%, 100% { opacity: 1; }
+      50% { opacity: 0; }
     }
 
     .scroll-indicator {
@@ -626,7 +643,9 @@
       <div class="video-panel"><canvas></canvas></div>
       <div class="video-panel"><canvas></canvas></div>
     </div>
-    <div class="hero-typing"></div>
+    <div class="hero-role">
+      <span class="hero-role-prefix">role:</span><span id="role-text"></span><span class="role-cursor"></span>
+    </div>
     <div class="scroll-indicator">
       <span class="scroll-text">Scroll to explore</span>
       <span class="scroll-line"></span>
@@ -1065,29 +1084,34 @@
     drawLoop();
   })();
 
-  // Typing Animation — Code Flood
+  // Typing Animation — role: 肩書き
   // ════════════════════════════════════════════════
-  (function initTyping() {
-    const container = document.querySelector('.hero-typing');
-    container.innerHTML = '<div id="code-flood-text"></div>';
+  (function initRoleTyping() {
+    const WORDS = ['CREATIVE DIRECTOR', 'PLANNER', 'COPYWRITER', 'WEB DEVELOPER', 'AI CREATOR'];
+    const el = document.getElementById('role-text');
+    let wordIdx = 0, charIdx = 0, deleting = false;
 
-    const el = document.getElementById('code-flood-text');
-
-    const CODE = 'const generate=async(prompt)=>{const res=await fetch("/api",{method:"POST",body:JSON.stringify({model:"claude-opus-4",messages:[{role:"user",content:prompt}]})});return res.json()};export default function Studio({data}){return data.map(({id,title,url,emoji})=><a key={id} href={url}>{emoji} {title}</a>)};const pipeline=tokens=>tokens.reduce((v,w)=>v*Math.sin(w),1);type Project={id:string;title:string;url:string;emoji:string;desc:string};async function render(items:Project[]):Promise<void>{await Promise.all(items.map(x=>load(x.url)))};const weights=Array.from({length:512},(_,i)=>Math.sin(i*0.08)*Math.cos(i));';
-
-    const flood = (CODE + ' ').repeat(6);
-
-    let i = 0;
-    function step() {
-      el.textContent = flood.slice(0, ++i);
-      if (i < flood.length && container.scrollHeight <= container.clientHeight + 20) {
-        setTimeout(step, 6);
-      } else if (i < flood.length) {
-        el.textContent = flood.slice(0, i);
+    function tick() {
+      const word = WORDS[wordIdx];
+      if (!deleting) {
+        el.textContent = word.slice(0, ++charIdx);
+        if (charIdx === word.length) {
+          setTimeout(() => { deleting = true; tick(); }, 1800);
+          return;
+        }
+        setTimeout(tick, 60 + Math.random() * 30);
+      } else {
+        el.textContent = word.slice(0, --charIdx);
+        if (charIdx === 0) {
+          deleting = false;
+          wordIdx = (wordIdx + 1) % WORDS.length;
+          setTimeout(tick, 300);
+          return;
+        }
+        setTimeout(tick, 30);
       }
     }
-
-    setTimeout(step, 400);
+    setTimeout(tick, 600);
   })();
 
   // ════════════════════════════════════════════════
