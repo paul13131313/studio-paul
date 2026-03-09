@@ -424,14 +424,6 @@
       background: #000000;
     }
 
-    /* ── Practice Section ── */
-    #practice {
-      position: relative;
-      z-index: 1;
-      padding: 3rem 0 4rem;
-      background: #000000;
-    }
-
     .works-grid {
       display: grid;
       grid-template-columns: repeat(3, 1fr);
@@ -707,7 +699,6 @@
     <a href="#hero" class="nav-logo"><img src="logo.png" alt="AI STUDIO PAUL TOKYO"></a>
     <div class="nav-links">
       <a href="#works">Works</a>
-      <a href="#practice">Practice</a>
       <button class="lang-toggle" id="lang-toggle" aria-label="Switch language">
         <span class="lang-jp lang-active">JP</span><span class="lang-sep">/</span><span class="lang-en">EN</span>
       </button>
@@ -749,17 +740,6 @@
     </a>
   </section>
 
-  <!-- Section Divider -->
-  <div class="section-divider"><hr></div>
-
-  <!-- Practice Section -->
-  <section id="practice">
-    <h2 class="section-title">Practice</h2>
-    <p class="section-desc" data-i18n="practice_subtitle">スキル習得のための実験・練習</p>
-    <div class="works-grid" id="practice-grid">
-      <div class="works-loading">Loading...</div>
-    </div>
-  </section>
 
   <footer>&copy; 2026 AI Studio Paul Tokyo</footer>
 
@@ -770,13 +750,11 @@
   const translations = {
     ja: {
       works_subtitle: '制作実績',
-      practice_subtitle: 'スキル習得のための実験・練習',
       other_works_link: 'AI以外の制作実績はこちら →',
       og_description: 'AI Studio Paul Tokyo — ポートフォリオ'
     },
     en: {
       works_subtitle: 'Production Results',
-      practice_subtitle: 'Experiments & Practice',
       other_works_link: 'Non-AI works here →',
       og_description: 'AI Studio Paul Tokyo — Portfolio'
     }
@@ -816,10 +794,7 @@
 
     // カードを再描画
     if (__sheetItems) {
-      const worksItems = __sheetItems.filter(i => i.category !== 'PRACTICE');
-      const practiceItems = __sheetItems.filter(i => i.category === 'PRACTICE');
-      document.getElementById('works-grid').innerHTML = renderWorksGrouped(worksItems, lang);
-      document.getElementById('practice-grid').innerHTML = renderCards(practiceItems, lang);
+      document.getElementById('works-grid').innerHTML = renderWorksGrouped(__sheetItems, lang);
       initScrollReveal();
     }
 
@@ -1369,13 +1344,16 @@
     { key: 'TOOLS & UTILITY', emoji: '🛠', label: 'Tools & Utility' },
     { key: 'TRAVEL',          emoji: '✈️', label: 'Travel' },
     { key: 'OTHER',           emoji: '🎨', label: 'Other' },
+    { key: 'PRACTICE',        emoji: '🧪', label: 'Practice' },
   ];
 
   function renderWorksGrouped(items, lang) {
     // カテゴリごとにグルーピング
     const grouped = {};
     items.forEach(item => {
-      const cat = item.category || 'OTHER';
+      // WORKSカテゴリはOTHERとして扱う（既存データ互換）
+      let cat = item.category || 'OTHER';
+      if (cat === 'WORKS') cat = 'OTHER';
       if (!grouped[cat]) grouped[cat] = [];
       grouped[cat].push(item);
     });
@@ -1385,24 +1363,21 @@
     const rendered = new Set();
 
     CATEGORY_ORDER.forEach(({ key, emoji, label }) => {
-      // WORKSも該当カテゴリに含める（既存データ互換）
       let catItems = grouped[key] || [];
       if (key === 'OTHER') {
-        // 未分類＋明示的OTHERをまとめる
+        // 未分類カテゴリもOTHERに含める
         Object.keys(grouped).forEach(k => {
           if (!rendered.has(k) && k !== key) {
             catItems = catItems.concat(grouped[k]);
           }
         });
-        // WORKS カテゴリも OTHER に含める
-        if (grouped['WORKS']) catItems = catItems.concat(grouped['WORKS']);
       }
       rendered.add(key);
 
       if (catItems.length === 0) return;
 
       html += `<div class="category-group">`;
-      html += `<div class="category-heading">${emoji} ${label}</div>`;
+      html += `<div class="category-heading">${emoji} ${label} <span style="opacity:0.4">(${catItems.length})</span></div>`;
       html += `<div class="compact-grid">`;
       catItems.forEach(item => {
         const title = (lang === 'en' && item.title_en) ? item.title_en : item.title;
@@ -1422,42 +1397,17 @@
     return html;
   }
 
-  function renderCards(items, lang) {
-    return items.map(item => {
-      const title = (lang === 'en' && item.title_en) ? item.title_en : item.title;
-      const desc = (lang === 'en' && item.desc_en) ? item.desc_en : item.desc;
-      // EN時は英語タイトルなので英語フォント、JA時は元のfont設定に従う
-      const useEnFont = (lang === 'en' && item.title_en) || (item.font && item.font.toLowerCase() !== 'ja');
-      const titleClass = useEnFont ? 'work-title-en' : 'work-title';
-      return `
-      <a href="${item.url}" target="_blank" rel="noopener" class="work-card" style="--accent: ${item.color};">
-        <div class="work-card-bg" style="background: ${item.bg};"></div>
-        <div class="work-card-shine"></div>
-        <div class="work-card-content">
-          <div class="work-emoji">${item.emoji}</div>
-          <div class="${titleClass}" style="color: ${item.color};">${title}</div>
-          <div class="work-desc" style="color: ${item.color};">${desc}</div>
-        </div>
-        <div class="work-arrow" style="color: ${item.color};">→</div>
-      </a>`;
-    }).join('');
-  }
-
   fetch(SHEET_CSV)
     .then(r => r.text())
     .then(text => {
       __sheetItems = parseCSV(text);
-      const worksItems = __sheetItems.filter(i => i.category !== 'PRACTICE');
-      const practiceItems = __sheetItems.filter(i => i.category === 'PRACTICE');
 
-      document.getElementById('works-grid').innerHTML = renderWorksGrouped(worksItems, currentLang);
-      document.getElementById('practice-grid').innerHTML = renderCards(practiceItems, currentLang);
+      document.getElementById('works-grid').innerHTML = renderWorksGrouped(__sheetItems, currentLang);
 
       initScrollReveal();
     })
     .catch(() => {
       document.getElementById('works-grid').innerHTML = '<div class="works-loading">Failed to load</div>';
-      document.getElementById('practice-grid').innerHTML = '<div class="works-loading">Failed to load</div>';
     });
 
   // ════════════════════════════════════════════════

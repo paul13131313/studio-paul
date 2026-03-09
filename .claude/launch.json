@@ -1,0 +1,11 @@
+{
+  "version": "0.0.1",
+  "configurations": [
+    {
+      "name": "studio-paul",
+      "runtimeExecutable": "npx",
+      "runtimeArgs": ["serve", "-l", "3011"],
+      "port": 3011
+    }
+  ]
+}
