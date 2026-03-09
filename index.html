@@ -554,6 +554,98 @@
       color: var(--text-secondary);
     }
 
+    /* ── Category Group ── */
+    .category-group {
+      max-width: 1100px;
+      margin: 0 auto 2rem;
+      padding: 0 24px;
+    }
+
+    .category-heading {
+      font-family: 'Space Mono', monospace;
+      font-size: 0.75rem;
+      letter-spacing: 0.15em;
+      text-transform: uppercase;
+      color: var(--text-secondary);
+      margin-bottom: 0.8rem;
+      padding-bottom: 0.4rem;
+      border-bottom: 1px solid var(--border);
+    }
+
+    .compact-grid {
+      display: grid;
+      grid-template-columns: repeat(5, 1fr);
+      gap: 10px;
+    }
+
+    .compact-card {
+      position: relative;
+      border-radius: 10px;
+      overflow: hidden;
+      border: 1px solid var(--border);
+      text-decoration: none;
+      color: inherit;
+      display: flex;
+      align-items: center;
+      gap: 0.4rem;
+      padding: 0.6rem 0.8rem;
+      background: var(--bg-card);
+      transition: background 0.3s, border-color 0.3s, transform 0.3s;
+      cursor: none;
+      opacity: 0;
+      transform: translateY(20px);
+    }
+
+    .compact-card.revealed {
+      opacity: 1;
+      transform: translateY(0);
+    }
+
+    .compact-card:hover {
+      transform: translateY(-4px) !important;
+      border-color: var(--accent, rgba(255,255,255,0.15));
+    }
+
+    .compact-card .cc-emoji {
+      font-size: 1.1rem;
+      flex-shrink: 0;
+      line-height: 1;
+    }
+
+    .compact-card .cc-title {
+      font-family: 'Noto Sans JP', sans-serif;
+      font-weight: 700;
+      font-size: 0.72rem;
+      line-height: 1.3;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    .compact-card .cc-title-en {
+      font-family: 'Orbitron', 'Syne', sans-serif;
+      font-weight: 700;
+      font-size: 0.65rem;
+      letter-spacing: 0.03em;
+      text-transform: uppercase;
+      line-height: 1.2;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    @media (max-width: 900px) {
+      .compact-grid { grid-template-columns: repeat(3, 1fr); }
+    }
+
+    @media (max-width: 768px) {
+      .compact-card { cursor: pointer; }
+    }
+
+    @media (max-width: 480px) {
+      .compact-grid { grid-template-columns: repeat(2, 1fr); }
+    }
+
     /* ── Footer ── */
     footer {
       position: relative;
@@ -649,8 +741,8 @@
   <section id="works">
     <h2 class="section-title">Works</h2>
     <p class="section-desc" data-i18n="works_subtitle">制作実績</p>
-    <div class="works-grid" id="works-grid">
-      <div class="works-loading">Loading...</div>
+    <div id="works-grid">
+      <div class="works-loading" style="text-align:center;padding:5rem;font-family:'Space Mono',monospace;font-size:0.7rem;letter-spacing:0.2em;color:var(--text-secondary);">Loading...</div>
     </div>
     <a href="https://docs.google.com/presentation/d/1z--3WagTBVek8H2nULYDAg5Yhd4iFYNesW1fVS4QtFU/edit?usp=sharing" target="_blank" rel="noopener" class="other-works-link">
       <span data-i18n="other_works_link">AI以外の制作実績はこちら →</span>
@@ -726,7 +818,7 @@
     if (__sheetItems) {
       const worksItems = __sheetItems.filter(i => i.category !== 'PRACTICE');
       const practiceItems = __sheetItems.filter(i => i.category === 'PRACTICE');
-      document.getElementById('works-grid').innerHTML = renderCards(worksItems, lang);
+      document.getElementById('works-grid').innerHTML = renderWorksGrouped(worksItems, lang);
       document.getElementById('practice-grid').innerHTML = renderCards(practiceItems, lang);
       initScrollReveal();
     }
@@ -1179,6 +1271,22 @@
       titles.forEach(t => titleObs.observe(t));
     }
 
+    // Compact cards
+    const compactCards = document.querySelectorAll('.compact-card');
+    const compactObs = new IntersectionObserver(entries => {
+      entries.forEach(entry => {
+        if (entry.isIntersecting) {
+          const siblings = entry.target.parentElement.querySelectorAll('.compact-card');
+          const idx = Array.from(siblings).indexOf(entry.target);
+          entry.target.style.transitionDelay = `${idx * 0.03}s`;
+          entry.target.style.transition = 'opacity 0.5s ease, transform 0.5s ease, background 0.3s, border-color 0.3s';
+          requestAnimationFrame(() => entry.target.classList.add('revealed'));
+          compactObs.unobserve(entry.target);
+        }
+      });
+    }, { threshold: 0.1 });
+    compactCards.forEach(c => compactObs.observe(c));
+
     // Work cards
     const cards = document.querySelectorAll('.work-card');
     const cardObs = new IntersectionObserver(entries => {
@@ -1250,6 +1358,70 @@
     return rows;
   }
 
+  // カテゴリ順序と絵文字マッピング
+  const CATEGORY_ORDER = [
+    { key: 'AI TOOLS',        emoji: '🤖', label: 'AI Tools' },
+    { key: 'VIDEO & MEDIA',   emoji: '🎬', label: 'Video & Media' },
+    { key: 'GAMES & FUN',     emoji: '🎮', label: 'Games & Fun' },
+    { key: 'FEEDS',           emoji: '🍜', label: 'Feeds' },
+    { key: 'DATA & MAPS',     emoji: '📊', label: 'Data & Maps' },
+    { key: 'MUSIC',           emoji: '🎵', label: 'Music' },
+    { key: 'TOOLS & UTILITY', emoji: '🛠', label: 'Tools & Utility' },
+    { key: 'TRAVEL',          emoji: '✈️', label: 'Travel' },
+    { key: 'OTHER',           emoji: '🎨', label: 'Other' },
+  ];
+
+  function renderWorksGrouped(items, lang) {
+    // カテゴリごとにグルーピング
+    const grouped = {};
+    items.forEach(item => {
+      const cat = item.category || 'OTHER';
+      if (!grouped[cat]) grouped[cat] = [];
+      grouped[cat].push(item);
+    });
+
+    // 定義順でレンダリング、未定義カテゴリはOTHERへ
+    let html = '';
+    const rendered = new Set();
+
+    CATEGORY_ORDER.forEach(({ key, emoji, label }) => {
+      // WORKSも該当カテゴリに含める（既存データ互換）
+      let catItems = grouped[key] || [];
+      if (key === 'OTHER') {
+        // 未分類＋明示的OTHERをまとめる
+        Object.keys(grouped).forEach(k => {
+          if (!rendered.has(k) && k !== key) {
+            catItems = catItems.concat(grouped[k]);
+          }
+        });
+        // WORKS カテゴリも OTHER に含める
+        if (grouped['WORKS']) catItems = catItems.concat(grouped['WORKS']);
+      }
+      rendered.add(key);
+
+      if (catItems.length === 0) return;
+
+      html += `<div class="category-group">`;
+      html += `<div class="category-heading">${emoji} ${label}</div>`;
+      html += `<div class="compact-grid">`;
+      catItems.forEach(item => {
+        const title = (lang === 'en' && item.title_en) ? item.title_en : item.title;
+        const useEnFont = (lang === 'en' && item.title_en) || (item.font && item.font.toLowerCase() !== 'ja');
+        const titleClass = useEnFont ? 'cc-title-en' : 'cc-title';
+        html += `
+        <a href="${item.url}" target="_blank" rel="noopener" class="compact-card" style="--accent: ${item.color};" data-bg="${item.bg}"
+          onmouseenter="this.style.background=this.dataset.bg"
+          onmouseleave="this.style.background='var(--bg-card)'">
+          ${item.emoji ? `<span class="cc-emoji">${item.emoji}</span>` : ''}
+          <span class="${titleClass}" style="color: ${item.color};">${title}</span>
+        </a>`;
+      });
+      html += `</div></div>`;
+    });
+
+    return html;
+  }
+
   function renderCards(items, lang) {
     return items.map(item => {
       const title = (lang === 'en' && item.title_en) ? item.title_en : item.title;
@@ -1278,7 +1450,7 @@
       const worksItems = __sheetItems.filter(i => i.category !== 'PRACTICE');
       const practiceItems = __sheetItems.filter(i => i.category === 'PRACTICE');
 
-      document.getElementById('works-grid').innerHTML = renderCards(worksItems, currentLang);
+      document.getElementById('works-grid').innerHTML = renderWorksGrouped(worksItems, currentLang);
       document.getElementById('practice-grid').innerHTML = renderCards(practiceItems, currentLang);
 
       initScrollReveal();

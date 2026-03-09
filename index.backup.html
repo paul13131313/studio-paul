@@ -1,0 +1,455 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>AI STUDIO PAUL — TOKYO</title>
+
+  <!-- OGP -->
+  <meta property="og:title" content="AI STUDIO PAUL — TOKYO">
+  <meta property="og:description" content="AI Studio Paul Tokyo — ポートフォリオ">
+  <meta property="og:image" content="https://paul13131313.github.io/studio-paul/ogp.png">
+  <meta property="og:url" content="https://paul13131313.github.io/studio-paul/">
+  <meta property="og:type" content="website">
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:title" content="AI STUDIO PAUL — TOKYO">
+  <meta name="twitter:description" content="AI Studio Paul Tokyo — ポートフォリオ">
+  <meta name="twitter:image" content="https://paul13131313.github.io/studio-paul/ogp.png">
+
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700&family=Courier+Prime&family=Noto+Sans+JP:wght@300;700&family=Orbitron:wght@700&display=swap" rel="stylesheet">
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+
+    body {
+      background: #111;
+      color: #e8e0d0;
+      font-family: 'Noto Sans JP', sans-serif;
+      font-weight: 300;
+    }
+
+    body::before {
+      content: '';
+      position: fixed;
+      top: 0; left: 0;
+      width: 100%; height: 100%;
+      background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.03'/%3E%3C/svg%3E");
+      pointer-events: none;
+      z-index: 9999;
+    }
+
+    .header {
+      text-align: center;
+      padding: 2.5rem 2rem 2rem;
+    }
+
+    .logo {
+      width: clamp(80px, 14vw, 110px);
+    }
+
+    .grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      width: 100%;
+    }
+
+    .panel {
+      position: relative;
+      aspect-ratio: 4 / 3;
+      overflow: hidden;
+      cursor: pointer;
+      text-decoration: none;
+      color: inherit;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      text-align: center;
+      transition: transform 0.3s, filter 0.3s;
+    }
+
+    .panel:hover {
+      filter: brightness(1.1);
+    }
+
+    .panel-emoji {
+      font-size: clamp(2rem, 4vw, 3.5rem);
+      margin-bottom: 0.6rem;
+      line-height: 1;
+    }
+
+    .panel-label {
+      font-family: 'Noto Sans JP', sans-serif;
+      font-weight: 700;
+      font-size: clamp(1rem, 2.2vw, 1.8rem);
+      line-height: 1.2;
+      padding: 0 1rem;
+      letter-spacing: 0.02em;
+    }
+
+    .panel-label-en {
+      font-family: 'Orbitron', 'Playfair Display', serif;
+      font-weight: 700;
+      font-size: clamp(1rem, 2.5vw, 2rem);
+      line-height: 1.1;
+      letter-spacing: 0.05em;
+      text-transform: uppercase;
+      padding: 0 1rem;
+    }
+
+    .panel-sub {
+      font-size: clamp(0.55rem, 0.9vw, 0.75rem);
+      margin-top: 0.4rem;
+      opacity: 0.7;
+      padding: 0 1rem;
+      font-weight: 300;
+    }
+
+    .loading {
+      grid-column: 1 / -1;
+      text-align: center;
+      padding: 5rem;
+      font-family: 'Courier Prime', monospace;
+      font-size: 0.7rem;
+      letter-spacing: 0.2em;
+      color: #6b6256;
+    }
+
+    footer {
+      text-align: center;
+      padding: 2.5rem 2rem 2rem;
+      font-family: 'Courier Prime', monospace;
+      font-size: 0.55rem;
+      letter-spacing: 0.2em;
+      color: #6b6256;
+      text-transform: uppercase;
+    }
+
+    /* MY RANKING */
+    .ranking-section {
+      padding: 3rem 2rem 1rem;
+    }
+
+    .ranking-title {
+      font-family: 'Orbitron', monospace;
+      font-weight: 700;
+      font-size: clamp(0.7rem, 1.2vw, 0.9rem);
+      letter-spacing: 0.25em;
+      color: #6b6256;
+      text-transform: uppercase;
+      text-align: center;
+      margin-bottom: 2rem;
+    }
+
+    .ranking-grid {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 1px;
+      background: #1a1a1a;
+    }
+
+    .ranking-card {
+      background: #181818;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      padding: 2rem 1rem;
+      cursor: pointer;
+      transition: background 0.3s, filter 0.3s;
+      text-align: center;
+      aspect-ratio: 4 / 3;
+    }
+
+    .ranking-card:hover {
+      background: #222;
+      filter: brightness(1.15);
+    }
+
+    .ranking-card-icon {
+      font-size: clamp(1.8rem, 3.5vw, 3rem);
+      margin-bottom: 0.6rem;
+      line-height: 1;
+    }
+
+    .ranking-card-name {
+      font-family: 'Noto Sans JP', sans-serif;
+      font-weight: 700;
+      font-size: clamp(0.7rem, 1.4vw, 1.1rem);
+      color: #e8e0d0;
+      letter-spacing: 0.04em;
+    }
+
+    /* Modal overlay */
+    .ranking-overlay {
+      position: fixed;
+      top: 0; left: 0;
+      width: 100%; height: 100%;
+      background: rgba(0, 0, 0, 0.85);
+      z-index: 5000;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      opacity: 0;
+      visibility: hidden;
+      transition: opacity 0.35s, visibility 0.35s;
+    }
+
+    .ranking-overlay.active {
+      opacity: 1;
+      visibility: visible;
+    }
+
+    .ranking-modal {
+      background: #181818;
+      border: 1px solid #2a2a2a;
+      width: 90%;
+      max-width: 480px;
+      max-height: 80vh;
+      overflow-y: auto;
+      transform: translateY(30px);
+      transition: transform 0.35s;
+      position: relative;
+    }
+
+    .ranking-overlay.active .ranking-modal {
+      transform: translateY(0);
+    }
+
+    .ranking-modal-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 1.5rem 1.8rem;
+      border-bottom: 1px solid #2a2a2a;
+    }
+
+    .ranking-modal-title {
+      font-family: 'Noto Sans JP', sans-serif;
+      font-weight: 700;
+      font-size: clamp(1rem, 2vw, 1.4rem);
+      color: #e8e0d0;
+    }
+
+    .ranking-modal-title span {
+      margin-right: 0.5rem;
+    }
+
+    .ranking-modal-close {
+      background: none;
+      border: none;
+      color: #6b6256;
+      font-size: 1.4rem;
+      cursor: pointer;
+      padding: 0.2rem;
+      line-height: 1;
+      transition: color 0.2s;
+    }
+
+    .ranking-modal-close:hover {
+      color: #e8e0d0;
+    }
+
+    .ranking-list {
+      list-style: none;
+      padding: 0.5rem 0;
+    }
+
+    .ranking-item {
+      display: flex;
+      align-items: center;
+      padding: 0.9rem 1.8rem;
+      gap: 1rem;
+      transition: background 0.2s;
+    }
+
+    .ranking-item:hover {
+      background: #1f1f1f;
+    }
+
+    .ranking-num {
+      font-family: 'Orbitron', monospace;
+      font-weight: 700;
+      font-size: clamp(0.85rem, 1.5vw, 1.1rem);
+      color: #6b6256;
+      min-width: 2rem;
+      text-align: right;
+    }
+
+    .ranking-item:nth-child(1) .ranking-num { color: #c9a84c; }
+    .ranking-item:nth-child(2) .ranking-num { color: #8a8a8a; }
+    .ranking-item:nth-child(3) .ranking-num { color: #9a6e3a; }
+
+    .ranking-item-title {
+      font-family: 'Noto Sans JP', sans-serif;
+      font-weight: 300;
+      font-size: clamp(0.8rem, 1.4vw, 1rem);
+      color: #e8e0d0;
+    }
+
+    .ranking-loading {
+      text-align: center;
+      padding: 3rem;
+      font-family: 'Courier Prime', monospace;
+      font-size: 0.7rem;
+      letter-spacing: 0.2em;
+      color: #6b6256;
+    }
+
+    @media (max-width: 900px) {
+      .grid { grid-template-columns: repeat(2, 1fr); }
+      .ranking-grid { grid-template-columns: repeat(3, 1fr); }
+    }
+
+    @media (max-width: 500px) {
+      .grid { grid-template-columns: 1fr; }
+      .panel { aspect-ratio: 16 / 10; }
+      .header { padding: 2rem 1rem 1.5rem; }
+      .ranking-grid { grid-template-columns: repeat(2, 1fr); }
+      .ranking-card { aspect-ratio: 3 / 2; }
+      .ranking-section { padding: 2rem 0 1rem; }
+    }
+  </style>
+</head>
+<body>
+
+  <div class="header">
+    <img src="logo.png" alt="AI STUDIO PAUL TOKYO" class="logo">
+  </div>
+
+  <div class="grid" id="grid">
+    <div class="loading">Loading...</div>
+  </div>
+
+  <div class="ranking-section">
+    <div class="ranking-title">My Ranking</div>
+    <div class="ranking-grid" id="ranking-grid">
+      <div class="ranking-loading">Loading...</div>
+    </div>
+  </div>
+
+  <div class="ranking-overlay" id="ranking-overlay">
+    <div class="ranking-modal">
+      <div class="ranking-modal-header">
+        <div class="ranking-modal-title" id="ranking-modal-title"></div>
+        <button class="ranking-modal-close" id="ranking-close">&times;</button>
+      </div>
+      <ul class="ranking-list" id="ranking-list"></ul>
+    </div>
+  </div>
+
+  <footer>&copy; 2025 AI Studio Paul Tokyo</footer>
+
+  <script>
+    const SHEET_CSV = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vTK9SAFKJrv3hyi6mulfb3HAaiAYmu0dKx8MOw5gwX4LJtOanKVMoti5DoDVRwix3DHsKX9KqsBF9si/pub?output=csv';
+
+    // CSVパース: A=タイトル B=URL C=説明 D=サムネ(未使用) E=絵文字 F=背景色 G=文字色 H=フォント(en/ja)
+    function parseCSV(text) {
+      const lines = text.split('\n').filter(l => l.trim());
+      const rows = [];
+      for (let i = 1; i < lines.length; i++) {
+        const cols = [];
+        let current = '';
+        let inQuotes = false;
+        for (const ch of lines[i]) {
+          if (ch === '"') { inQuotes = !inQuotes; }
+          else if (ch === ',' && !inQuotes) { cols.push(current.trim()); current = ''; }
+          else { current += ch; }
+        }
+        cols.push(current.trim());
+        if (cols[0]) rows.push({
+          title: cols[0],
+          url:   cols[1] || '',
+          desc:  cols[2] || '',
+          thumb: cols[3] || '',
+          emoji: cols[4] || '🔗',
+          bg:    cols[5] || 'linear-gradient(135deg, #2a2a2a 0%, #1a1a1a 100%)',
+          color: cols[6] || '#e8e0d0',
+          font:  cols[7] || 'ja'
+        });
+      }
+      return rows;
+    }
+
+    fetch(SHEET_CSV)
+      .then(r => r.text())
+      .then(text => {
+        const items = parseCSV(text);
+        const grid = document.getElementById('grid');
+        grid.innerHTML = items.map(item => {
+          const labelClass = item.font === 'en' ? 'panel-label-en' : 'panel-label';
+          return `
+          <a href="${item.url}" target="_blank" rel="noopener" class="panel"
+             style="background:${item.bg};">
+            <div class="panel-emoji">${item.emoji}</div>
+            <div class="${labelClass}" style="color:${item.color}">${item.title}</div>
+            <div class="panel-sub" style="color:${item.color}">${item.desc}</div>
+          </a>
+        `}).join('');
+      })
+      .catch(() => {
+        document.getElementById('grid').innerHTML = '<div class="loading">Failed to load</div>';
+      });
+
+    // MY RANKING
+    const RANKING_API = 'https://my-ranking-api.hiroshinagano0113.workers.dev';
+
+    fetch(`${RANKING_API}/rankings`)
+      .then(r => r.json())
+      .then(categories => {
+        const grid = document.getElementById('ranking-grid');
+        grid.innerHTML = categories.map(c => `
+          <div class="ranking-card" data-id="${c.id}" data-name="${c.name}" data-icon="${c.icon}">
+            <div class="ranking-card-icon">${c.icon}</div>
+            <div class="ranking-card-name">${c.name}</div>
+          </div>
+        `).join('');
+
+        grid.addEventListener('click', e => {
+          const card = e.target.closest('.ranking-card');
+          if (!card) return;
+          openRanking(card.dataset.id, card.dataset.icon, card.dataset.name);
+        });
+      })
+      .catch(() => {
+        document.getElementById('ranking-grid').innerHTML = '<div class="ranking-loading">Failed to load</div>';
+      });
+
+    function openRanking(id, icon, name) {
+      const overlay = document.getElementById('ranking-overlay');
+      const list = document.getElementById('ranking-list');
+      const title = document.getElementById('ranking-modal-title');
+      title.innerHTML = `<span>${icon}</span>${name}`;
+      list.innerHTML = '<div class="ranking-loading">Loading...</div>';
+      overlay.classList.add('active');
+
+      fetch(`${RANKING_API}/rankings/${id}`)
+        .then(r => r.json())
+        .then(items => {
+          if (!items.length) {
+            list.innerHTML = '<div class="ranking-loading">No items</div>';
+            return;
+          }
+          list.innerHTML = items.map(item => `
+            <li class="ranking-item">
+              <div class="ranking-num">${item.rank}</div>
+              <div class="ranking-item-title">${item.title}</div>
+            </li>
+          `).join('');
+        })
+        .catch(() => {
+          list.innerHTML = '<div class="ranking-loading">Failed to load</div>';
+        });
+    }
+
+    document.getElementById('ranking-close').addEventListener('click', () => {
+      document.getElementById('ranking-overlay').classList.remove('active');
+    });
+    document.getElementById('ranking-overlay').addEventListener('click', e => {
+      if (e.target === e.currentTarget) {
+        e.currentTarget.classList.remove('active');
+      }
+    });
+  </script>
+</body>
+</html>
