@@ -3,1429 +3,219 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>AI STUDIO PAUL — TOKYO</title>
-
-  <!-- OGP -->
-  <meta property="og:title" content="AI STUDIO PAUL — TOKYO">
-  <meta property="og:description" content="AI Studio Paul Tokyo — ポートフォリオ">
+  <title>AI STUDIO PAUL</title>
+  <meta name="description" content="AI STUDIO PAUL — サムネイルグリッドポートフォリオ">
+  <meta property="og:title" content="AI STUDIO PAUL">
+  <meta property="og:description" content="AI STUDIO PAUL — サムネイルグリッドポートフォリオ">
   <meta property="og:image" content="https://paul13131313.github.io/studio-paul/ogp.png">
-  <meta property="og:url" content="https://paul13131313.github.io/studio-paul/">
-  <meta property="og:type" content="website">
+  <meta property="og:image:width" content="1200">
+  <meta property="og:image:height" content="630">
   <meta name="twitter:card" content="summary_large_image">
-  <meta name="twitter:title" content="AI STUDIO PAUL — TOKYO">
-  <meta name="twitter:description" content="AI Studio Paul Tokyo — ポートフォリオ">
-  <meta name="twitter:image" content="https://paul13131313.github.io/studio-paul/ogp.png">
-
-  <!-- Favicon -->
-  <link rel="icon" href="favicon.png" type="image/png">
-  <link rel="apple-touch-icon" href="favicon.png">
-
+  <link rel="icon" type="image/png" href="favicon.png">
   <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link href="https://fonts.googleapis.com/css2?family=Syne:wght@700;800&family=Space+Mono:wght@400;700&family=Noto+Sans+JP:wght@400;700&family=Orbitron:wght@700&display=swap" rel="stylesheet">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700;800&family=Noto+Sans+JP:wght@400;700&display=swap" rel="stylesheet">
   <style>
-    /* ── Reset & Variables ── */
-    *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
-
-    :root {
-      --bg-primary: #000000;
-      --bg-card: rgba(255,255,255,0.03);
-      --text-primary: rgba(255,255,255,0.9);
-      --text-secondary: rgba(255,255,255,0.5);
-      --gold: #ffffff;
-      --gold-dim: rgba(255, 255, 255, 0.4);
-      --border: rgba(255,255,255,0.08);
-      --gradient-accent: linear-gradient(135deg, #333 0%, #111 100%);
+    *, *::before, *::after {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
     }
-
-    html { scroll-behavior: smooth; }
 
     body {
-      background: var(--bg-primary);
-      color: var(--text-primary);
+      background: #000;
+      margin: 0;
+      padding: 0;
       font-family: 'Noto Sans JP', sans-serif;
-      font-weight: 400;
-      overflow-x: hidden;
-      cursor: none;
     }
 
-    /* ── Film grain overlay ── */
-    body::before {
-      content: '';
-      position: fixed;
-      top: 0; left: 0;
-      width: 100%; height: 100%;
-      background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.03'/%3E%3C/svg%3E");
-      pointer-events: none;
-      z-index: 9999;
+    .header {
+      background: #000;
+      padding: 1rem 2rem;
     }
 
-    /* ── Custom Cursor (PC only) ── */
-    .custom-cursor {
-      width: 12px;
-      height: 12px;
-      background: rgba(255, 255, 255, 0.8);
-      border-radius: 50%;
-      position: fixed;
-      top: -6px;
-      left: -6px;
-      pointer-events: none;
-      z-index: 10001;
-      transition: width 0.2s ease, height 0.2s ease, top 0.2s ease, left 0.2s ease, background 0.2s ease;
-      mix-blend-mode: difference;
-      will-change: transform;
+    .header-title {
+      font-family: 'Playfair Display', Times, serif;
+      font-weight: 800;
+      font-size: 0.8rem;
+      letter-spacing: 0.3em;
+      color: #fff;
     }
 
-    .custom-cursor.hover {
-      width: 40px;
-      height: 40px;
-      top: -20px;
-      left: -20px;
-      background: rgba(255, 255, 255, 0.15);
-    }
-
-
-    /* ── Navigation ── */
-    nav {
-      position: fixed;
-      top: 0; left: 0;
-      width: 100%;
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      padding: 0.8rem 2rem;
-      z-index: 9998;
-      background: transparent;
-      transition: background 0.3s, backdrop-filter 0.3s;
-    }
-
-    .nav-logo {
-      display: flex;
-      align-items: center;
-      flex-shrink: 0;
-    }
-
-    .nav-logo img {
-      height: 40px;
-      width: auto;
-      filter: brightness(0) invert(1);
-      transition: filter 0.6s ease;
-    }
-
-    .nav-logo:hover img {
-      filter: brightness(0) invert(1) drop-shadow(0 0 30px rgba(255, 255, 255, 0.2));
-    }
-
-    nav.scrolled .nav-logo img {
-      filter: brightness(0) invert(1);
-    }
-
-    nav.scrolled .nav-logo:hover img {
-      filter: brightness(0) invert(1) drop-shadow(0 0 30px rgba(255, 255, 255, 0.2));
-    }
-
-    .nav-links {
-      display: flex;
-      gap: 2.5rem;
-      align-items: center;
-    }
-
-    nav a {
-      font-family: 'Space Mono', monospace;
-      font-size: 0.7rem;
-      letter-spacing: 0.2em;
-      text-transform: uppercase;
-      color: rgba(255, 255, 255, 0.5);
-      text-decoration: none;
-      transition: color 0.6s;
-      cursor: none;
-    }
-
-    nav a:hover { color: rgba(255, 255, 255, 0.9); }
-
-    nav.scrolled a { color: rgba(255, 255, 255, 0.5); }
-    nav.scrolled a:hover { color: rgba(255, 255, 255, 0.9); }
-
-    .lang-toggle {
-      background: none;
-      border: 1px solid rgba(255, 255, 255, 0.15);
-      border-radius: 4px;
-      padding: 0.25rem 0.5rem;
-      font-family: 'Space Mono', monospace;
-      font-size: 0.6rem;
-      letter-spacing: 0.1em;
-      color: rgba(255, 255, 255, 0.5);
-      cursor: none;
-      transition: border-color 0.3s;
-      display: flex;
-      align-items: center;
+    .grid {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
       gap: 0;
     }
-    .lang-toggle:hover {
-      border-color: rgba(255, 255, 255, 0.35);
-    }
-    .lang-toggle .lang-jp,
-    .lang-toggle .lang-en {
-      padding: 0.1rem 0.3rem;
-      transition: color 0.3s, opacity 0.3s;
-      opacity: 0.35;
-    }
-    .lang-toggle .lang-sep {
-      opacity: 0.2;
-      padding: 0 0.1rem;
-    }
-    .lang-toggle .lang-active {
-      opacity: 1;
-      color: rgba(255, 255, 255, 0.95);
-    }
 
-    .nav-hamburger {
-      display: none;
-      background: none;
-      border: none;
-      width: 24px;
-      height: 18px;
-      position: fixed;
-      top: 1.2rem;
-      right: 1.2rem;
-      z-index: 9999;
-      cursor: none;
-      flex-direction: column;
-      justify-content: space-between;
-    }
-
-    .nav-hamburger span {
-      display: block;
-      width: 100%;
-      height: 2px;
-      background: var(--text-primary);
-      transition: transform 0.3s, opacity 0.3s;
-    }
-
-    .nav-hamburger.open span:nth-child(1) { transform: translateY(8px) rotate(45deg); }
-    .nav-hamburger.open span:nth-child(2) { opacity: 0; }
-    .nav-hamburger.open span:nth-child(3) { transform: translateY(-8px) rotate(-45deg); }
-
-    /* ── Hero Section ── */
-    #hero {
+    .panel {
       position: relative;
-      height: 100vh;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      justify-content: center;
-      text-align: center;
-      z-index: 1;
-    }
-
-    #hero-canvas {
-      position: fixed;
-      top: 0; left: 0;
-      width: 100%; height: 100%;
-      z-index: -1;
-    }
-
-    .video-panels {
-      position: absolute;
-      top: 50%;
-      left: 50%;
-      transform: translate(-50%, -50%);
-      width: 85%;
-      max-width: 1100px;
-      z-index: 1;
-      display: grid;
-      grid-template-columns: repeat(3, 1fr);
-      grid-template-rows: auto auto;
-      gap: 12px;
-    }
-
-    .video-panel {
-      border-radius: 12px;
+      display: block;
+      aspect-ratio: 16 / 9;
       overflow: hidden;
-      aspect-ratio: 16 / 10;
+      text-decoration: none;
+      cursor: pointer;
     }
 
-    .video-panel canvas {
+    .panel img {
       width: 100%;
       height: 100%;
+      object-fit: cover;
       display: block;
     }
 
-    /* ── Role Typing (center overlay) ── */
-    .hero-role {
-      position: absolute;
-      top: 50%;
-      left: 50%;
-      transform: translate(-50%, -50%);
-      z-index: 3;
-      font-family: 'Syne', sans-serif;
-      font-weight: 800;
-      font-size: clamp(2.5rem, 8vw, 7rem);
-      letter-spacing: -0.02em;
-      text-transform: uppercase;
-      color: #ffffff;
-      white-space: nowrap;
-      line-height: 1;
-      pointer-events: none;
-    }
-    .role-cursor {
-      display: inline-block;
-      width: clamp(3px, 0.5vw, 6px);
-      height: 0.85em;
-      background: #ffffff;
-      margin-left: 0.05em;
-      animation: role-blink 0.5s step-end infinite;
-      vertical-align: text-bottom;
-    }
-    @keyframes role-blink {
-      0%, 100% { opacity: 1; }
-      50% { opacity: 0; }
-    }
-
-    .scroll-indicator {
-      position: absolute;
-      bottom: 2.5rem;
-      left: 50%;
-      transform: translateX(-50%);
-      z-index: 1;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      gap: 0.6rem;
-    }
-
-    .scroll-text {
-      font-family: 'Space Mono', monospace;
-      font-size: 0.55rem;
-      letter-spacing: 0.2em;
-      text-transform: uppercase;
-      color: rgba(255, 255, 255, 0.4);
-      opacity: 0;
-      animation: fade-in-up 0.8s ease 1.5s forwards;
-    }
-
-    .scroll-line {
-      display: block;
-      width: 1px;
-      height: 32px;
-      background: linear-gradient(to bottom, rgba(255, 255, 255, 0.3), transparent);
-      animation: scroll-line-grow 1.8s ease-in-out infinite;
-      transform-origin: top;
-    }
-
-    @keyframes scroll-line-grow {
-      0% { transform: scaleY(0); opacity: 0; }
-      50% { transform: scaleY(1); opacity: 1; }
-      100% { transform: scaleY(0); opacity: 0; transform-origin: bottom; }
-    }
-
-    @keyframes fade-in-up {
-      from { opacity: 0; transform: translateY(8px); }
-      to { opacity: 1; transform: translateY(0); }
-    }
-
-    /* ── Section Titles ── */
-    .section-title {
-      font-family: 'Syne', sans-serif;
-      font-weight: 800;
-      font-size: clamp(2rem, 5vw, 3.5rem);
-      letter-spacing: 0.08em;
-      text-transform: uppercase;
-      color: var(--text-primary);
-      text-align: center;
-      margin-bottom: 3rem;
-      opacity: 0;
-      transform: translateX(-60px);
-      filter: blur(4px);
-      transition: opacity 0.7s ease, transform 0.7s cubic-bezier(0.16, 1, 0.3, 1), filter 0.7s ease;
-    }
-
-    @supports (animation-timeline: view()) {
-      .section-title {
-        opacity: 1;
-        transform: translateX(0);
-        filter: blur(0);
-        animation: slide-in-left linear both;
-        animation-timeline: view();
-        animation-range: entry 0% entry 60%;
-      }
-    }
-
-    @keyframes slide-in-left {
-      from {
-        opacity: 0;
-        transform: translateX(-60px);
-        filter: blur(4px);
-      }
-      to {
-        opacity: 1;
-        transform: translateX(0);
-        filter: blur(0);
-      }
-    }
-
-    .section-title.revealed {
-      opacity: 1;
-      transform: translateX(0);
-      filter: blur(0);
-    }
-
-    /* ── Section Description ── */
-    .section-desc {
-      text-align: center;
-      font-size: 0.85rem;
-      color: var(--muted);
-      letter-spacing: 0.05em;
-      margin-top: -0.5rem;
-      margin-bottom: 2rem;
-      opacity: 0;
-      transform: translateY(10px);
-      transition: opacity 0.6s ease 0.2s, transform 0.6s ease 0.2s;
-    }
-    .section-desc.revealed {
-      opacity: 1;
-      transform: translateY(0);
-    }
-
-    .other-works-link {
-      display: block;
-      text-align: center;
-      margin-top: 2.5rem;
-      font-family: 'Space Mono', monospace;
-      font-size: 0.75rem;
-      letter-spacing: 0.1em;
-      color: var(--gold-dim);
-      text-decoration: none;
-      transition: color 0.3s ease;
-    }
-
-    .other-works-link:hover {
-      color: var(--gold);
-    }
-
-    /* ── Section Divider ── */
-    .section-divider {
-      position: relative;
-      z-index: 1;
-      background: #000000;
-    }
-    .section-divider hr {
-      max-width: 1100px;
-      margin: 0 auto;
-      border: none;
-      border-top: 1px solid var(--border);
-      opacity: 0.4;
-    }
-
-    /* ── Works Section ── */
-    #works {
-      position: relative;
-      z-index: 1;
-      padding: 6rem 0 4rem;
-      background: #000000;
-    }
-
-    .works-grid {
-      display: grid;
-      grid-template-columns: repeat(3, 1fr);
-      gap: 20px;
-      max-width: 1100px;
-      margin: 0 auto;
-      padding: 0 24px;
-    }
-
-    .work-card {
-      position: relative;
-      border-radius: 16px;
-      overflow: hidden;
-      border: 1px solid var(--border);
-      text-decoration: none;
-      color: inherit;
-      display: block;
-      opacity: 0;
-      transition: opacity 0.7s ease, transform 0.7s cubic-bezier(0.16, 1, 0.3, 1), border-color 0.3s;
-      cursor: none;
-    }
-
-    .work-card.from-left { transform: translateX(-50px); }
-    .work-card.from-bottom { transform: translateY(50px); }
-    .work-card.from-right { transform: translateX(50px); }
-
-    .work-card.revealed {
-      opacity: 1;
-      transform: translate(0, 0);
-    }
-
-    .work-card:hover {
-      transform: translateY(-8px) !important;
-      border-color: var(--accent, rgba(255,255,255,0.15));
-    }
-
-    .work-card-bg {
-      position: absolute;
-      top: 0; left: 0;
-      width: 100%; height: 100%;
-      z-index: 0;
-    }
-
-    .work-card-shine {
-      position: absolute;
-      top: 0; left: -100%;
-      width: 100%; height: 100%;
-      background: linear-gradient(90deg, transparent, rgba(255,255,255,0.04), transparent);
-      transition: left 0.6s ease;
-      pointer-events: none;
-      z-index: 1;
-    }
-
-    .work-card:hover .work-card-shine { left: 100%; }
-
-    .work-card-content {
-      position: relative;
-      z-index: 2;
-      padding: 1.8rem 1.5rem;
-      min-height: 160px;
-      display: flex;
-      flex-direction: column;
-    }
-
-    .work-emoji {
-      font-size: 2rem;
-      margin-bottom: 0.8rem;
-      line-height: 1;
-    }
-
-    .work-title {
-      font-family: 'Noto Sans JP', sans-serif;
-      font-weight: 700;
-      font-size: clamp(0.9rem, 1.5vw, 1.15rem);
-      margin-bottom: 0.4rem;
-      line-height: 1.3;
-    }
-
-    .work-title-en {
-      font-family: 'Orbitron', 'Syne', sans-serif;
-      font-weight: 700;
-      font-size: clamp(0.85rem, 1.5vw, 1.1rem);
-      letter-spacing: 0.05em;
-      text-transform: uppercase;
-      margin-bottom: 0.4rem;
-      line-height: 1.2;
-    }
-
-    .work-desc {
-      font-size: 0.75rem;
-      opacity: 0.7;
-      line-height: 1.5;
-      flex: 1;
-    }
-
-    .work-arrow {
-      position: absolute;
-      bottom: 16px;
-      right: 16px;
-      opacity: 0;
-      transform: translateX(-8px);
-      transition: opacity 0.3s, transform 0.3s;
-      font-size: 18px;
-      z-index: 2;
-    }
-
-    .work-card:hover .work-arrow {
-      opacity: 1;
-      transform: translateX(0);
-    }
-
-
-    .works-loading {
-      grid-column: 1 / -1;
-      text-align: center;
-      padding: 5rem;
-      font-family: 'Space Mono', monospace;
-      font-size: 0.7rem;
-      letter-spacing: 0.2em;
-      color: var(--text-secondary);
-    }
-
-    /* ── Category Group ── */
-    .category-group {
-      max-width: 1100px;
-      margin: 0 auto 2rem;
-      padding: 0 24px;
-    }
-
-    .category-heading {
-      font-family: 'Space Mono', monospace;
-      font-size: 0.75rem;
-      letter-spacing: 0.15em;
-      text-transform: uppercase;
-      color: var(--text-secondary);
-      margin-bottom: 0.8rem;
-      padding-bottom: 0.4rem;
-      border-bottom: 1px solid var(--border);
-    }
-
-    .compact-grid {
-      display: grid;
-      grid-template-columns: repeat(5, 1fr);
-      gap: 10px;
-    }
-
-    .compact-card {
-      position: relative;
-      border-radius: 10px;
-      overflow: hidden;
-      border: 1px solid var(--border);
-      text-decoration: none;
-      color: inherit;
+    .panel-placeholder {
+      width: 100%;
+      height: 100%;
       display: flex;
       align-items: center;
-      gap: 0.4rem;
-      padding: 0.6rem 0.8rem;
-      background: var(--bg-card);
-      transition: background 0.3s, border-color 0.3s, transform 0.3s;
-      cursor: none;
-      opacity: 0;
-      transform: translateY(20px);
+      justify-content: center;
     }
 
-    .compact-card.revealed {
-      opacity: 1;
-      transform: translateY(0);
-    }
-
-    .compact-card:hover {
-      transform: translateY(-4px) !important;
-      border-color: var(--accent, rgba(255,255,255,0.15));
-    }
-
-    .compact-card .cc-emoji {
-      font-size: 1.1rem;
-      flex-shrink: 0;
+    .panel-emoji {
+      font-size: clamp(2rem, 4vw, 4rem);
       line-height: 1;
     }
 
-    .compact-card .cc-title {
-      font-family: 'Noto Sans JP', sans-serif;
-      font-weight: 700;
-      font-size: 0.72rem;
-      line-height: 1.3;
-      white-space: nowrap;
-      overflow: hidden;
-      text-overflow: ellipsis;
+    .panel-overlay {
+      position: absolute;
+      inset: 0;
+      background: rgba(0, 0, 0, 0.6);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      opacity: 0;
+      transition: opacity 0.25s ease;
+      padding: 0.5rem;
     }
 
-    .compact-card .cc-title-en {
-      font-family: 'Orbitron', 'Syne', sans-serif;
-      font-weight: 700;
-      font-size: 0.65rem;
-      letter-spacing: 0.03em;
-      text-transform: uppercase;
-      line-height: 1.2;
-      white-space: nowrap;
-      overflow: hidden;
-      text-overflow: ellipsis;
+    .panel:hover .panel-overlay {
+      opacity: 1;
     }
 
-    @media (max-width: 900px) {
-      .compact-grid { grid-template-columns: repeat(3, 1fr); }
+    .panel-title {
+      font-family: 'Playfair Display', 'Noto Sans JP', Times, sans-serif;
+      font-weight: 700;
+      font-size: clamp(0.7rem, 1.2vw, 1rem);
+      color: #fff;
+      text-align: center;
+      word-break: break-word;
+      line-height: 1.4;
+    }
+
+    /* モバイル: hover がないデバイス */
+    @media (hover: none) {
+      .panel-overlay {
+        opacity: 1;
+        background: linear-gradient(to top, rgba(0, 0, 0, 0.7) 0%, transparent 60%);
+        align-items: flex-end;
+        justify-content: flex-start;
+        padding: 0 0.5rem 0.5rem 0.5rem;
+      }
+
+      .panel-title {
+        text-align: left;
+        font-size: clamp(0.6rem, 2.5vw, 0.85rem);
+      }
+    }
+
+    /* レスポンシブ: 列数 */
+    @media (max-width: 1200px) {
+      .grid {
+        grid-template-columns: repeat(3, 1fr);
+      }
     }
 
     @media (max-width: 768px) {
-      .compact-card { cursor: pointer; }
-    }
-
-    @media (max-width: 480px) {
-      .compact-grid { grid-template-columns: repeat(2, 1fr); }
-    }
-
-    /* ── Footer ── */
-    footer {
-      position: relative;
-      z-index: 1;
-      text-align: center;
-      padding: 3rem 2rem;
-      font-family: 'Space Mono', monospace;
-      font-size: 0.55rem;
-      letter-spacing: 0.2em;
-      color: var(--text-secondary);
-      text-transform: uppercase;
-      background: #000000;
-    }
-
-    /* ── Responsive ── */
-    @media (max-width: 900px) {
-      .works-grid { grid-template-columns: repeat(2, 1fr); }
-    }
-
-    @media (max-width: 768px) {
-      .video-panels { width: 90%; grid-template-columns: repeat(2, 1fr); grid-template-rows: repeat(2, 1fr); }
-      .video-panel:nth-child(5),
-      .video-panel:nth-child(6) { display: none; }
-      .nav-links { display: none; }
-      nav.mobile-open .nav-links {
-        display: flex;
-        flex-direction: column;
-        position: fixed;
-        top: 0; left: 0;
-        width: 100%; height: 100vh;
-        gap: 1.5rem;
-        padding: 5rem 2rem 2rem;
-        background: rgba(0, 0, 0, 0.95);
-        backdrop-filter: blur(16px);
-        -webkit-backdrop-filter: blur(16px);
-        align-items: center;
-        justify-content: center;
+      .grid {
+        grid-template-columns: repeat(2, 1fr);
       }
-      .nav-logo img { height: 26px; }
-      .nav-hamburger { display: flex; }
-      body { cursor: auto; }
-      .custom-cursor { display: none; }
-      .lang-toggle { cursor: pointer; }
     }
 
     @media (max-width: 480px) {
-      .works-grid { grid-template-columns: 1fr; }
-      .work-card-content { min-height: 130px; }
+      .grid {
+        grid-template-columns: repeat(2, 1fr);
+      }
+
+      .header {
+        padding: 0.8rem 1rem;
+      }
+
+      .header-title {
+        font-size: 0.7rem;
+      }
     }
   </style>
 </head>
 <body>
-
-  <!-- Custom Cursor -->
-  <div class="custom-cursor" id="custom-cursor"></div>
-
-  <!-- Navigation -->
-  <nav id="nav">
-    <a href="#hero" class="nav-logo"><img src="logo.png" alt="AI STUDIO PAUL TOKYO"></a>
-    <div class="nav-links">
-      <a href="#works">Works</a>
-      <button class="lang-toggle" id="lang-toggle" aria-label="Switch language">
-        <span class="lang-jp lang-active">JP</span><span class="lang-sep">/</span><span class="lang-en">EN</span>
-      </button>
-    </div>
-  </nav>
-  <button class="nav-hamburger" id="nav-hamburger" aria-label="Menu">
-    <span></span><span></span><span></span>
-  </button>
-
-  <!-- Hero Section -->
-  <section id="hero">
-    <canvas id="hero-canvas"></canvas>
-    <div class="video-panels" id="video-panels">
-      <div class="video-panel"><canvas></canvas></div>
-      <div class="video-panel"><canvas></canvas></div>
-      <div class="video-panel"><canvas></canvas></div>
-      <div class="video-panel"><canvas></canvas></div>
-      <div class="video-panel"><canvas></canvas></div>
-      <div class="video-panel"><canvas></canvas></div>
-    </div>
-    <div class="hero-role">
-      <span id="role-text"></span><span class="role-cursor"></span>
-    </div>
-    <div class="scroll-indicator">
-      <span class="scroll-text">Scroll to explore</span>
-      <span class="scroll-line"></span>
-    </div>
-  </section>
-
-  <!-- Works Section -->
-  <section id="works">
-    <h2 class="section-title">Works</h2>
-    <p class="section-desc" data-i18n="works_subtitle">制作実績</p>
-    <div id="works-grid">
-      <div class="works-loading" style="text-align:center;padding:5rem;font-family:'Space Mono',monospace;font-size:0.7rem;letter-spacing:0.2em;color:var(--text-secondary);">Loading...</div>
-    </div>
-    <a href="https://docs.google.com/presentation/d/1z--3WagTBVek8H2nULYDAg5Yhd4iFYNesW1fVS4QtFU/edit?usp=sharing" target="_blank" rel="noopener" class="other-works-link">
-      <span data-i18n="other_works_link">AI以外の制作実績はこちら →</span>
-    </a>
-  </section>
-
-
-  <footer>&copy; 2026 AI Studio Paul Tokyo</footer>
+  <header class="header">
+    <span class="header-title">AI STUDIO PAUL</span>
+  </header>
+  <main class="grid" id="grid"></main>
 
   <script>
-  // ════════════════════════════════════════════════
-  // i18n — Language Switching
-  // ════════════════════════════════════════════════
-  const translations = {
-    ja: {
-      works_subtitle: '制作実績',
-      other_works_link: 'AI以外の制作実績はこちら →',
-      og_description: 'AI Studio Paul Tokyo — ポートフォリオ'
-    },
-    en: {
-      works_subtitle: 'Production Results',
-      other_works_link: 'Non-AI works here →',
-      og_description: 'AI Studio Paul Tokyo — Portfolio'
-    }
-  };
+    const SHEET_CSV = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vTK9SAFKJrv3hyi6mulfb3HAaiAYmu0dKx8MOw5gwX4LJtOanKVMoti5DoDVRwix3DHsKX9KqsBF9si/pub?output=csv';
 
-  let currentLang = localStorage.getItem('studio-paul-lang') || 'ja';
-  let __sheetItems = null;
-
-  function setLanguage(lang) {
-    currentLang = lang;
-    localStorage.setItem('studio-paul-lang', lang);
-
-    // <html lang> を更新
-    document.documentElement.lang = lang;
-
-    // data-i18n 要素のテキストを切り替え
-    document.querySelectorAll('[data-i18n]').forEach(el => {
-      const key = el.getAttribute('data-i18n');
-      if (translations[lang] && translations[lang][key]) {
-        el.textContent = translations[lang][key];
-      }
-    });
-
-    // OGP メタタグを更新
-    const ogDesc = document.querySelector('meta[property="og:description"]');
-    const twDesc = document.querySelector('meta[name="twitter:description"]');
-    if (ogDesc) ogDesc.setAttribute('content', translations[lang].og_description);
-    if (twDesc) twDesc.setAttribute('content', translations[lang].og_description);
-
-    // トグルボタンのアクティブ表示を更新
-    const jpLabel = document.querySelector('.lang-jp');
-    const enLabel = document.querySelector('.lang-en');
-    if (jpLabel && enLabel) {
-      jpLabel.classList.toggle('lang-active', lang === 'ja');
-      enLabel.classList.toggle('lang-active', lang === 'en');
-    }
-
-    // カードを再描画
-    if (__sheetItems) {
-      document.getElementById('works-grid').innerHTML = renderWorksGrouped(__sheetItems, lang);
-      initScrollReveal();
-    }
-
-  }
-
-  // トグルボタンのクリックイベント
-  document.getElementById('lang-toggle').addEventListener('click', () => {
-    setLanguage(currentLang === 'ja' ? 'en' : 'ja');
-  });
-
-  // ════════════════════════════════════════════════
-  // WebGL Hero Background — Simplex Noise Shader
-  // ════════════════════════════════════════════════
-  (function initHeroGL() {
-    const canvas = document.getElementById('hero-canvas');
-    const gl = canvas.getContext('webgl2') || canvas.getContext('webgl');
-    if (!gl) { canvas.style.background = '#000000'; return; }
-
-    const vertSrc = `#version 300 es
-    in vec2 a_pos;
-    void main() { gl_Position = vec4(a_pos, 0.0, 1.0); }`;
-
-    const fragSrc = `#version 300 es
-    precision highp float;
-    uniform float u_time;
-    uniform vec2 u_mouse;
-    uniform vec2 u_resolution;
-    uniform float u_scroll;
-    out vec4 fragColor;
-
-    // Simplex 3D noise
-    vec4 permute(vec4 x){return mod(((x*34.0)+1.0)*x,289.0);}
-    vec4 taylorInvSqrt(vec4 r){return 1.79284291400159-0.85373472095314*r;}
-
-    float snoise(vec3 v){
-      const vec2 C=vec2(1.0/6.0,1.0/3.0);
-      const vec4 D=vec4(0.0,0.5,1.0,2.0);
-      vec3 i=floor(v+dot(v,C.yyy));
-      vec3 x0=v-i+dot(i,C.xxx);
-      vec3 g=step(x0.yzx,x0.xyz);
-      vec3 l=1.0-g;
-      vec3 i1=min(g.xyz,l.zxy);
-      vec3 i2=max(g.xyz,l.zxy);
-      vec3 x1=x0-i1+C.xxx;
-      vec3 x2=x0-i2+C.yyy;
-      vec3 x3=x0-D.yyy;
-      i=mod(i,289.0);
-      vec4 p=permute(permute(permute(
-        i.z+vec4(0.0,i1.z,i2.z,1.0))
-        +i.y+vec4(0.0,i1.y,i2.y,1.0))
-        +i.x+vec4(0.0,i1.x,i2.x,1.0));
-      float n_=1.0/7.0;
-      vec3 ns=n_*D.wyz-D.xzx;
-      vec4 j=p-49.0*floor(p*ns.z*ns.z);
-      vec4 x_=floor(j*ns.z);
-      vec4 y_=floor(j-7.0*x_);
-      vec4 x=x_*ns.x+ns.yyyy;
-      vec4 y=y_*ns.x+ns.yyyy;
-      vec4 h=1.0-abs(x)-abs(y);
-      vec4 b0=vec4(x.xy,y.xy);
-      vec4 b1=vec4(x.zw,y.zw);
-      vec4 s0=floor(b0)*2.0+1.0;
-      vec4 s1=floor(b1)*2.0+1.0;
-      vec4 sh=-step(h,vec4(0.0));
-      vec4 a0=b0.xzyw+s0.xzyw*sh.xxyy;
-      vec4 a1=b1.xzyw+s1.xzyw*sh.zzww;
-      vec3 p0=vec3(a0.xy,h.x);
-      vec3 p1=vec3(a0.zw,h.y);
-      vec3 p2=vec3(a1.xy,h.z);
-      vec3 p3=vec3(a1.zw,h.w);
-      vec4 norm=taylorInvSqrt(vec4(dot(p0,p0),dot(p1,p1),dot(p2,p2),dot(p3,p3)));
-      p0*=norm.x;p1*=norm.y;p2*=norm.z;p3*=norm.w;
-      vec4 m=max(0.6-vec4(dot(x0,x0),dot(x1,x1),dot(x2,x2),dot(x3,x3)),0.0);
-      m=m*m;
-      return 42.0*dot(m*m,vec4(dot(p0,x0),dot(p1,x1),dot(p2,x2),dot(p3,x3)));
-    }
-
-    void main(){
-      vec2 uv=gl_FragCoord.xy/u_resolution;
-      vec2 center=vec2(0.5+u_mouse.x*0.15-0.075, 0.5+u_mouse.y*0.15-0.075);
-
-      float n1=snoise(vec3(uv*1.5, u_time*0.12));
-      float n2=snoise(vec3(uv*2.5+0.5, u_time*0.15+10.0));
-      float n3=snoise(vec3(uv*0.8+1.0, u_time*0.08+20.0));
-
-      vec2 distorted=uv+vec2(n1,n2)*0.12;
-      float d=length((distorted-center)*vec2(1.0, u_resolution.y/u_resolution.x));
-
-      float blob=smoothstep(0.45, 0.05, d+n3*0.1);
-
-      vec3 darkGray=vec3(0.08, 0.08, 0.08);
-      vec3 midGray=vec3(0.15, 0.15, 0.15);
-      vec3 black=vec3(0.0, 0.0, 0.0);
-
-      vec3 blobColor=mix(midGray, darkGray, blob*0.8+n1*0.2);
-      vec3 color=mix(black, blobColor, blob);
-
-      float edge=smoothstep(0.4, 0.15, d+n3*0.1);
-      color=mix(color, midGray*0.5, edge*0.3*(1.0-blob));
-
-      float darkBlend=smoothstep(0.0, 0.5, u_scroll);
-      vec3 darkBg=vec3(0.0, 0.0, 0.0);
-      color=mix(color, darkBg, darkBlend);
-
-      fragColor=vec4(color,1.0);
-    }`;
-
-    // Fallback for WebGL1
-    const fragSrcV1 = `precision highp float;
-    uniform float u_time;
-    uniform vec2 u_mouse;
-    uniform vec2 u_resolution;
-    uniform float u_scroll;
-
-    vec4 permute(vec4 x){return mod(((x*34.0)+1.0)*x,289.0);}
-    vec4 taylorInvSqrt(vec4 r){return 1.79284291400159-0.85373472095314*r;}
-
-    float snoise(vec3 v){
-      const vec2 C=vec2(1.0/6.0,1.0/3.0);
-      const vec4 D=vec4(0.0,0.5,1.0,2.0);
-      vec3 i=floor(v+dot(v,C.yyy));
-      vec3 x0=v-i+dot(i,C.xxx);
-      vec3 g=step(x0.yzx,x0.xyz);
-      vec3 l=1.0-g;
-      vec3 i1=min(g.xyz,l.zxy);
-      vec3 i2=max(g.xyz,l.zxy);
-      vec3 x1=x0-i1+C.xxx;
-      vec3 x2=x0-i2+C.yyy;
-      vec3 x3=x0-D.yyy;
-      i=mod(i,289.0);
-      vec4 p=permute(permute(permute(
-        i.z+vec4(0.0,i1.z,i2.z,1.0))
-        +i.y+vec4(0.0,i1.y,i2.y,1.0))
-        +i.x+vec4(0.0,i1.x,i2.x,1.0));
-      float n_=1.0/7.0;
-      vec3 ns=n_*D.wyz-D.xzx;
-      vec4 j=p-49.0*floor(p*ns.z*ns.z);
-      vec4 x_=floor(j*ns.z);
-      vec4 y_=floor(j-7.0*x_);
-      vec4 x=x_*ns.x+ns.yyyy;
-      vec4 y=y_*ns.x+ns.yyyy;
-      vec4 h=1.0-abs(x)-abs(y);
-      vec4 b0=vec4(x.xy,y.xy);
-      vec4 b1=vec4(x.zw,y.zw);
-      vec4 s0=floor(b0)*2.0+1.0;
-      vec4 s1=floor(b1)*2.0+1.0;
-      vec4 sh=-step(h,vec4(0.0));
-      vec4 a0=b0.xzyw+s0.xzyw*sh.xxyy;
-      vec4 a1=b1.xzyw+s1.xzyw*sh.zzww;
-      vec3 p0=vec3(a0.xy,h.x);
-      vec3 p1=vec3(a0.zw,h.y);
-      vec3 p2=vec3(a1.xy,h.z);
-      vec3 p3=vec3(a1.zw,h.w);
-      vec4 norm=taylorInvSqrt(vec4(dot(p0,p0),dot(p1,p1),dot(p2,p2),dot(p3,p3)));
-      p0*=norm.x;p1*=norm.y;p2*=norm.z;p3*=norm.w;
-      vec4 m=max(0.6-vec4(dot(x0,x0),dot(x1,x1),dot(x2,x2),dot(x3,x3)),0.0);
-      m=m*m;
-      return 42.0*dot(m*m,vec4(dot(p0,x0),dot(p1,x1),dot(p2,x2),dot(p3,x3)));
-    }
-
-    void main(){
-      vec2 uv=gl_FragCoord.xy/u_resolution;
-      vec2 center=vec2(0.5+u_mouse.x*0.15-0.075, 0.5+u_mouse.y*0.15-0.075);
-
-      float n1=snoise(vec3(uv*1.5, u_time*0.12));
-      float n2=snoise(vec3(uv*2.5+0.5, u_time*0.15+10.0));
-      float n3=snoise(vec3(uv*0.8+1.0, u_time*0.08+20.0));
-
-      vec2 distorted=uv+vec2(n1,n2)*0.12;
-      float d=length((distorted-center)*vec2(1.0, u_resolution.y/u_resolution.x));
-
-      float blob=smoothstep(0.45, 0.05, d+n3*0.1);
-
-      vec3 darkGray=vec3(0.08, 0.08, 0.08);
-      vec3 midGray=vec3(0.15, 0.15, 0.15);
-      vec3 black=vec3(0.0, 0.0, 0.0);
-
-      vec3 blobColor=mix(midGray, darkGray, blob*0.8+n1*0.2);
-      vec3 color=mix(black, blobColor, blob);
-
-      float edge=smoothstep(0.4, 0.15, d+n3*0.1);
-      color=mix(color, midGray*0.5, edge*0.3*(1.0-blob));
-
-      float darkBlend=smoothstep(0.0, 0.5, u_scroll);
-      vec3 darkBg=vec3(0.0, 0.0, 0.0);
-      color=mix(color, darkBg, darkBlend);
-
-      gl_FragColor=vec4(color,1.0);
-    }`;
-
-    const vertSrcV1 = `attribute vec2 a_pos;
-    void main() { gl_Position = vec4(a_pos, 0.0, 1.0); }`;
-
-    const isWebGL2 = gl instanceof WebGL2RenderingContext;
-
-    function compile(type, src) {
-      const s = gl.createShader(type);
-      gl.shaderSource(s, src);
-      gl.compileShader(s);
-      if (!gl.getShaderParameter(s, gl.COMPILE_STATUS)) {
-        console.warn('Shader error:', gl.getShaderInfoLog(s));
-        return null;
-      }
-      return s;
-    }
-
-    const vs = compile(gl.VERTEX_SHADER, isWebGL2 ? vertSrc : vertSrcV1);
-    const fs = compile(gl.FRAGMENT_SHADER, isWebGL2 ? fragSrc : fragSrcV1);
-    if (!vs || !fs) { canvas.style.background = '#000000'; return; }
-
-    const prog = gl.createProgram();
-    gl.attachShader(prog, vs);
-    gl.attachShader(prog, fs);
-    if (isWebGL2) gl.bindAttribLocation(prog, 0, 'a_pos');
-    gl.linkProgram(prog);
-    gl.useProgram(prog);
-
-    const buf = gl.createBuffer();
-    gl.bindBuffer(gl.ARRAY_BUFFER, buf);
-    gl.bufferData(gl.ARRAY_BUFFER, new Float32Array([-1,-1, 1,-1, -1,1, 1,1]), gl.STATIC_DRAW);
-
-    const aPos = gl.getAttribLocation(prog, 'a_pos');
-    gl.enableVertexAttribArray(aPos);
-    gl.vertexAttribPointer(aPos, 2, gl.FLOAT, false, 0, 0);
-
-    const uTime = gl.getUniformLocation(prog, 'u_time');
-    const uMouse = gl.getUniformLocation(prog, 'u_mouse');
-    const uRes = gl.getUniformLocation(prog, 'u_resolution');
-    const uScroll = gl.getUniformLocation(prog, 'u_scroll');
-
-    let mx = 0.5, my = 0.5, scrollProgress = 0;
-    document.addEventListener('mousemove', e => {
-      mx = e.clientX / window.innerWidth;
-      my = 1.0 - e.clientY / window.innerHeight;
-    });
-    window.addEventListener('scroll', () => {
-      scrollProgress = Math.min(window.scrollY / (window.innerHeight * 3), 1.0);
-    }, { passive: true });
-
-    function resize() {
-      const dpr = Math.min(window.devicePixelRatio, 2) * 0.5;
-      canvas.width = canvas.clientWidth * dpr;
-      canvas.height = canvas.clientHeight * dpr;
-    }
-    resize();
-    window.addEventListener('resize', resize);
-
-    const start = performance.now();
-    function frame() {
-      if (scrollProgress < 1.0) {
-        gl.viewport(0, 0, canvas.width, canvas.height);
-        gl.uniform1f(uTime, (performance.now() - start) / 1000);
-        gl.uniform2f(uMouse, mx, my);
-        gl.uniform2f(uRes, canvas.width, canvas.height);
-        gl.uniform1f(uScroll, scrollProgress);
-        gl.drawArrays(gl.TRIANGLE_STRIP, 0, 4);
-      }
-      requestAnimationFrame(frame);
-    }
-    frame();
-  })();
-
-  // ════════════════════════════════════════════════
-  // Video Panels — 1つの動画 → 6つのcanvasに異なるオフセットで描画
-  // ════════════════════════════════════════════════
-  (function initVideoPanels() {
-    const video = document.createElement('video');
-    video.src = 'reel2025.mp4';
-    video.muted = true;
-    video.loop = true;
-    video.playsInline = true;
-    video.preload = 'auto';
-
-    const canvases = document.querySelectorAll('.video-panel canvas');
-    if (!canvases.length) return;
-
-    // 各パネルのタイムオフセット（秒）
-    const offsets = [0, 4, 8, 12, 16, 20];
-    const ctxList = [];
-
-    canvases.forEach((c, i) => {
-      ctxList.push(c.getContext('2d'));
-    });
-
-    // canvasのピクセルサイズを実表示サイズに合わせる
-    function resizeAll() {
-      canvases.forEach(c => {
-        const rect = c.getBoundingClientRect();
-        if (rect.width > 0 && rect.height > 0) {
-          c.width = Math.round(rect.width);
-          c.height = Math.round(rect.height);
+    function parseCSV(text) {
+      const lines = text.split('\n').filter(l => l.trim());
+      const rows = [];
+      for (let i = 1; i < lines.length; i++) {
+        const cols = [];
+        let current = '';
+        let inQuotes = false;
+        for (const ch of lines[i]) {
+          if (ch === '"') { inQuotes = !inQuotes; }
+          else if (ch === ',' && !inQuotes) { cols.push(current.trim()); current = ''; }
+          else { current += ch; }
         }
-      });
-    }
-    // 初回はDOMが安定してから
-    setTimeout(resizeAll, 100);
-    window.addEventListener('resize', resizeAll);
-
-    let duration = 0;
-
-    video.addEventListener('loadedmetadata', () => {
-      duration = video.duration;
-      video.play().catch(() => {});
-    });
-
-    // 描画ループ: 動画の現在時刻 + オフセットで各パネルの「仮想時刻」を計算
-    // 実際には1つの動画フレームを全パネルに描画するが、
-    // 各パネルを独立させるため、動画をシークする方式ではなく
-    // ソース動画のフレームを「切り取り位置をずらして」cover表示する
-    function drawLoop() {
-      if (video.readyState >= 2 && !video.paused) {
-        const vw = video.videoWidth;
-        const vh = video.videoHeight;
-
-        canvases.forEach((c, i) => {
-          if (c.width === 0 || c.height === 0) return;
-          const ctx = ctxList[i];
-          const cw = c.width;
-          const ch = c.height;
-
-          // object-fit: cover計算
-          const canvasRatio = cw / ch;
-          const videoRatio = vw / vh;
-          let sx, sy, sw, sh;
-
-          if (videoRatio > canvasRatio) {
-            sh = vh;
-            sw = vh * canvasRatio;
-            // パネルごとに水平の切り取り位置をずらす
-            const maxOffset = vw - sw;
-            sx = maxOffset * (i / (canvases.length - 1));
-            sy = 0;
-          } else {
-            sw = vw;
-            sh = vw / canvasRatio;
-            sx = 0;
-            // パネルごとに垂直の切り取り位置をずらす
-            const maxOffset = vh - sh;
-            sy = maxOffset * (i / (canvases.length - 1));
-          }
-
-          ctx.drawImage(video, sx, sy, sw, sh, 0, 0, cw, ch);
+        cols.push(current.trim());
+        if (cols[0]) rows.push({
+          title:     cols[0],
+          url:       cols[1] || '',
+          desc:      cols[2] || '',
+          category:  (cols[3] || '').toUpperCase().trim(),
+          emoji:     cols[4] || '🔗',
+          bg:        cols[5] || 'linear-gradient(135deg, #2a2a2a 0%, #1a1a1a 100%)',
+          color:     cols[6] || '#e8e0d0',
+          font:      cols[7] || 'ja',
+          desc_en:   cols[8] || '',
+          title_en:  cols[9] || '',
+          thumbnail: cols[10] || ''
         });
       }
-      requestAnimationFrame(drawLoop);
-    }
-    drawLoop();
-  })();
-
-  // Typing Animation — role: 肩書き
-  // ════════════════════════════════════════════════
-  (function initRoleTyping() {
-    const WORDS = ['CREATIVE DIRECTOR', 'PLANNER', 'COPYWRITER', 'WEB DEVELOPER'];
-    const el = document.getElementById('role-text');
-    let wordIdx = 0, charIdx = 0, deleting = false;
-
-    function tick() {
-      const word = WORDS[wordIdx];
-      if (!deleting) {
-        el.textContent = word.slice(0, ++charIdx);
-        if (charIdx === word.length) {
-          setTimeout(() => { deleting = true; tick(); }, 1800);
-          return;
-        }
-        setTimeout(tick, 60 + Math.random() * 30);
-      } else {
-        el.textContent = word.slice(0, --charIdx);
-        if (charIdx === 0) {
-          deleting = false;
-          wordIdx = (wordIdx + 1) % WORDS.length;
-          setTimeout(tick, 300);
-          return;
-        }
-        setTimeout(tick, 30);
-      }
-    }
-    setTimeout(tick, 600);
-  })();
-
-  // ════════════════════════════════════════════════
-  // Custom Cursor
-  // ════════════════════════════════════════════════
-  (function initCursor() {
-    if ('ontouchstart' in window || navigator.maxTouchPoints > 0) return;
-    const cursor = document.getElementById('custom-cursor');
-    if (!cursor) return;
-
-    document.addEventListener('mousemove', e => {
-      cursor.style.transform = `translate(${e.clientX}px, ${e.clientY}px)`;
-    });
-
-    document.addEventListener('mouseover', e => {
-      const t = e.target.closest('a, button, .work-card');
-      if (t) cursor.classList.add('hover');
-    });
-    document.addEventListener('mouseout', e => {
-      const t = e.target.closest('a, button, .work-card');
-      if (t) cursor.classList.remove('hover');
-    });
-  })();
-
-  // ════════════════════════════════════════════════
-  // Navigation — Scroll & Hamburger
-  // ════════════════════════════════════════════════
-  (function initNav() {
-    const hamburger = document.getElementById('nav-hamburger');
-    const nav = document.getElementById('nav');
-
-    hamburger.addEventListener('click', () => {
-      hamburger.classList.toggle('open');
-      nav.classList.toggle('mobile-open');
-    });
-
-    nav.querySelectorAll('a').forEach(a => {
-      a.addEventListener('click', () => {
-        hamburger.classList.remove('open');
-        nav.classList.remove('mobile-open');
-      });
-    });
-
-    // スクロールでロゴ・リンクの色を切り替え
-    const threshold = window.innerHeight * 0.4;
-    window.addEventListener('scroll', () => {
-      if (window.scrollY > threshold) {
-        nav.classList.add('scrolled');
-      } else {
-        nav.classList.remove('scrolled');
-      }
-    }, { passive: true });
-  })();
-
-  // ════════════════════════════════════════════════
-  // Scroll Progress Fallback
-  // ════════════════════════════════════════════════
-  // Intersection Observer — Reveal Animations
-  // ════════════════════════════════════════════════
-  function initScrollReveal() {
-    // Section titles (fallback for non-scroll-timeline)
-    if (!(CSS.supports && CSS.supports('animation-timeline', 'view()'))) {
-      const titles = document.querySelectorAll('.section-title, .section-desc');
-      const titleObs = new IntersectionObserver(entries => {
-        entries.forEach(e => {
-          if (e.isIntersecting) {
-            e.target.classList.add('revealed');
-            titleObs.unobserve(e.target);
-          }
-        });
-      }, { threshold: 0.1 });
-      titles.forEach(t => titleObs.observe(t));
+      return rows;
     }
 
-    // Compact cards
-    const compactCards = document.querySelectorAll('.compact-card');
-    const compactObs = new IntersectionObserver(entries => {
-      entries.forEach(entry => {
-        if (entry.isIntersecting) {
-          const siblings = entry.target.parentElement.querySelectorAll('.compact-card');
-          const idx = Array.from(siblings).indexOf(entry.target);
-          entry.target.style.transitionDelay = `${idx * 0.03}s`;
-          entry.target.style.transition = 'opacity 0.5s ease, transform 0.5s ease, background 0.3s, border-color 0.3s';
-          requestAnimationFrame(() => entry.target.classList.add('revealed'));
-          compactObs.unobserve(entry.target);
+    function renderGrid(items) {
+      const grid = document.getElementById('grid');
+      let html = '';
+
+      for (const item of items) {
+        const title = item.title;
+        const href = item.url ? ` href="${item.url}" target="_blank" rel="noopener"` : '';
+
+        let inner = '';
+        if (item.thumbnail) {
+          inner = `<img src="${item.thumbnail}" alt="${title}" loading="lazy">`;
+        } else {
+          inner = `<div class="panel-placeholder" style="background: ${item.bg}"><span class="panel-emoji">${item.emoji}</span></div>`;
         }
-      });
-    }, { threshold: 0.1 });
-    compactCards.forEach(c => compactObs.observe(c));
 
-    // Work cards
-    const cards = document.querySelectorAll('.work-card');
-    const cardObs = new IntersectionObserver(entries => {
-      entries.forEach(entry => {
-        if (entry.isIntersecting) {
-          const allCards = Array.from(cards);
-          const idx = allCards.indexOf(entry.target);
-          const cols = window.innerWidth > 900 ? 3 : window.innerWidth > 480 ? 2 : 1;
-          const col = idx % cols;
-          const directions = cols === 3 ? ['from-left', 'from-bottom', 'from-right'] :
-                             cols === 2 ? ['from-left', 'from-right'] : ['from-bottom'];
-          entry.target.classList.add(directions[col]);
-          entry.target.style.transitionDelay = `${(col) * 0.12}s`;
-          requestAnimationFrame(() => {
-            entry.target.classList.add('revealed');
-          });
-          cardObs.unobserve(entry.target);
-        }
-      });
-    }, { threshold: 0.1 });
-    cards.forEach(c => cardObs.observe(c));
-
-    // Status items
-    const statusItems = document.querySelectorAll('.status-item');
-    const statusObs = new IntersectionObserver(entries => {
-      entries.forEach(entry => {
-        if (entry.isIntersecting) {
-          const idx = Array.from(statusItems).indexOf(entry.target);
-          entry.target.style.transitionDelay = `${idx * 0.1}s`;
-          entry.target.classList.add('revealed');
-          statusObs.unobserve(entry.target);
-        }
-      });
-    }, { threshold: 0.1 });
-    statusItems.forEach(s => statusObs.observe(s));
-  }
-
-  // ════════════════════════════════════════════════
-  // Works — Google Sheets CSV
-  // ════════════════════════════════════════════════
-  const SHEET_CSV = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vTK9SAFKJrv3hyi6mulfb3HAaiAYmu0dKx8MOw5gwX4LJtOanKVMoti5DoDVRwix3DHsKX9KqsBF9si/pub?output=csv';
-
-  function parseCSV(text) {
-    const lines = text.split('\n').filter(l => l.trim());
-    const rows = [];
-    for (let i = 1; i < lines.length; i++) {
-      const cols = [];
-      let current = '';
-      let inQuotes = false;
-      for (const ch of lines[i]) {
-        if (ch === '"') { inQuotes = !inQuotes; }
-        else if (ch === ',' && !inQuotes) { cols.push(current.trim()); current = ''; }
-        else { current += ch; }
+        html += `<a${href} class="panel">${inner}<div class="panel-overlay"><span class="panel-title">${title}</span></div></a>`;
       }
-      cols.push(current.trim());
-      if (cols[0]) rows.push({
-        title:    cols[0],
-        url:      cols[1] || '',
-        desc:     cols[2] || '',
-        category: (cols[3] || '').toUpperCase().trim(),
-        emoji:    cols[4] || '🔗',
-        bg:       cols[5] || 'linear-gradient(135deg, #2a2a2a 0%, #1a1a1a 100%)',
-        color:    cols[6] || '#e8e0d0',
-        font:     cols[7] || 'ja',
-        desc_en:  cols[8] || '',
-        title_en: cols[9] || ''
-      });
+
+      grid.innerHTML = html;
     }
-    return rows;
-  }
 
-  // カテゴリ順序と絵文字マッピング
-  const CATEGORY_ORDER = [
-    { key: 'AI TOOLS',        emoji: '🤖', label: 'AI Tools' },
-    { key: 'VIDEO & MEDIA',   emoji: '🎬', label: 'Video & Media' },
-    { key: 'GAMES & FUN',     emoji: '🎮', label: 'Games & Fun' },
-    { key: 'FEEDS',           emoji: '🍜', label: 'Feeds' },
-    { key: 'DATA & MAPS',     emoji: '📊', label: 'Data & Maps' },
-    { key: 'MUSIC',           emoji: '🎵', label: 'Music' },
-    { key: 'TOOLS & UTILITY', emoji: '🛠', label: 'Tools & Utility' },
-    { key: 'TRAVEL',          emoji: '✈️', label: 'Travel' },
-    { key: 'OTHER',           emoji: '🎨', label: 'Other' },
-    { key: 'PRACTICE',        emoji: '🧪', label: 'Practice' },
-  ];
-
-  function renderWorksGrouped(items, lang) {
-    // カテゴリごとにグルーピング
-    const grouped = {};
-    items.forEach(item => {
-      // WORKSカテゴリはOTHERとして扱う（既存データ互換）
-      let cat = item.category || 'OTHER';
-      if (cat === 'WORKS') cat = 'OTHER';
-      if (!grouped[cat]) grouped[cat] = [];
-      grouped[cat].push(item);
-    });
-
-    // 定義順でレンダリング、未定義カテゴリはOTHERへ
-    let html = '';
-    const rendered = new Set();
-
-    CATEGORY_ORDER.forEach(({ key, emoji, label }) => {
-      let catItems = grouped[key] || [];
-      if (key === 'OTHER') {
-        // 未分類カテゴリもOTHERに含める
-        Object.keys(grouped).forEach(k => {
-          if (!rendered.has(k) && k !== key) {
-            catItems = catItems.concat(grouped[k]);
-          }
-        });
-      }
-      rendered.add(key);
-
-      if (catItems.length === 0) return;
-
-      html += `<div class="category-group">`;
-      html += `<div class="category-heading">${emoji} ${label} <span style="opacity:0.4">(${catItems.length})</span></div>`;
-      html += `<div class="compact-grid">`;
-      catItems.forEach(item => {
-        const title = (lang === 'en' && item.title_en) ? item.title_en : item.title;
-        const useEnFont = (lang === 'en' && item.title_en) || (item.font && item.font.toLowerCase() !== 'ja');
-        const titleClass = useEnFont ? 'cc-title-en' : 'cc-title';
-        html += `
-        <a href="${item.url}" target="_blank" rel="noopener" class="compact-card" style="--accent: ${item.color};" data-bg="${item.bg}"
-          onmouseenter="this.style.background=this.dataset.bg"
-          onmouseleave="this.style.background='var(--bg-card)'">
-          ${item.emoji ? `<span class="cc-emoji">${item.emoji}</span>` : ''}
-          <span class="${titleClass}" style="color: ${item.color};">${title}</span>
-        </a>`;
+    fetch(SHEET_CSV)
+      .then(r => r.text())
+      .then(text => {
+        const items = parseCSV(text);
+        renderGrid(items);
+      })
+      .catch(err => {
+        console.error('CSV fetch error:', err);
       });
-      html += `</div></div>`;
-    });
-
-    return html;
-  }
-
-  fetch(SHEET_CSV)
-    .then(r => r.text())
-    .then(text => {
-      __sheetItems = parseCSV(text);
-
-      document.getElementById('works-grid').innerHTML = renderWorksGrouped(__sheetItems, currentLang);
-
-      initScrollReveal();
-    })
-    .catch(() => {
-      document.getElementById('works-grid').innerHTML = '<div class="works-loading">Failed to load</div>';
-    });
-
-  // ════════════════════════════════════════════════
-  // Hero scroll fallback (non-scroll-timeline)
-  // ════════════════════════════════════════════════
-  (function heroFallback() {
-    if (CSS.supports && CSS.supports('animation-timeline', 'scroll()')) return;
-    const content = document.querySelector('.hero-content');
-    window.addEventListener('scroll', () => {
-      const t = Math.min(window.scrollY / (window.innerHeight * 0.3), 1);
-      content.style.opacity = 1 - t;
-      content.style.transform = `translateY(${-80 * t}px) scale(${1 - 0.05 * t})`;
-      content.style.filter = `blur(${6 * t}px)`;
-    }, { passive: true });
-  })();
-
-  // 保存された言語設定を適用
-  setLanguage(currentLang);
   </script>
 </body>
 </html>
