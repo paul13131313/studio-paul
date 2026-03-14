@@ -34,6 +34,10 @@
     .header {
       background: #000;
       padding: 1rem 2rem;
+      display: flex;
+      align-items: baseline;
+      justify-content: space-between;
+      gap: 1rem;
     }
 
     .header-title {
@@ -43,6 +47,14 @@
       letter-spacing: -0.02em;
       line-height: 1;
       color: #fff;
+      white-space: nowrap;
+    }
+
+    .header-copy {
+      font-size: clamp(0.65rem, 1.2vw, 0.85rem);
+      color: #666;
+      line-height: 1.4;
+      text-align: right;
     }
 
     .grid {
@@ -140,12 +152,17 @@
       .header-title {
         font-size: 0.7rem;
       }
+
+      .header-copy {
+        font-size: 0.5rem;
+      }
     }
   </style>
 </head>
 <body>
   <header class="header">
     <span class="header-title">AI STUDIO PAUL</span>
+    <span class="header-copy">Claude CodeでVibe Codingした100のWebサイト・アプリ・bot・プラグイン・サービス</span>
   </header>
   <main class="grid" id="grid"></main>
 
