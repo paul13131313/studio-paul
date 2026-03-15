@@ -152,6 +152,34 @@
       }
     }
 
+    /* Accordion */
+    .panel.hidden-panel {
+      display: none;
+    }
+
+    .panel.hidden-panel.show {
+      display: block;
+    }
+
+    .expand-btn {
+      display: block;
+      width: 100%;
+      padding: 1.2rem;
+      background: #111;
+      border: none;
+      color: #666;
+      font-family: 'Outfit', sans-serif;
+      font-size: 0.8rem;
+      font-weight: 700;
+      letter-spacing: 0.15em;
+      cursor: pointer;
+      transition: color 0.2s;
+    }
+
+    .expand-btn:hover {
+      color: #fff;
+    }
+
     /* レスポンシブ: 列数 */
     @media (max-width: 1200px) {
       .grid {
@@ -197,6 +225,7 @@
     <span class="header-copy">100 Contents with VibeCoding</span>
   </header>
   <main class="grid" id="grid"></main>
+  <button class="expand-btn" id="expandBtn" style="display:none"></button>
 
   <script>
     const SHEET_CSV = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vTK9SAFKJrv3hyi6mulfb3HAaiAYmu0dKx8MOw5gwX4LJtOanKVMoti5DoDVRwix3DHsKX9KqsBF9si/pub?output=csv';
@@ -281,12 +310,15 @@
         }
       }
 
+      const VISIBLE_COUNT = 16;
       let html = '';
-      for (const item of ordered) {
+      for (let idx = 0; idx < ordered.length; idx++) {
+        const item = ordered[idx];
         const title = item.title;
         const href = item.url ? ` href="${item.url}" target="_blank" rel="noopener"` : '';
         const slug = slugify(item.url);
         const thumbUrl = `thumbs/${slug}.webp`;
+        const hiddenClass = idx >= VISIBLE_COUNT ? ' hidden-panel' : '';
 
         let badgeHtml = '';
         if (item.badge === 'new') {
@@ -295,7 +327,7 @@
           badgeHtml = '<span class="panel-badge badge-hot">HOT</span>';
         }
 
-        html += `<a${href} class="panel" data-slug="${slug}">` +
+        html += `<a${href} class="panel${hiddenClass}" data-slug="${slug}">` +
           badgeHtml +
           `<img src="${thumbUrl}" alt="${title}" loading="lazy" onerror="this.style.display='none';this.nextElementSibling.style.display='block'">` +
           `<div class="panel-placeholder" style="background:${item.bg};display:none"></div>` +
@@ -304,6 +336,21 @@
       }
 
       grid.innerHTML = html;
+
+      // Accordion button
+      const hiddenCount = ordered.length - VISIBLE_COUNT;
+      const expandBtn = document.getElementById('expandBtn');
+      if (hiddenCount > 0) {
+        expandBtn.textContent = `+ MORE (${hiddenCount})`;
+        expandBtn.style.display = 'block';
+        let expanded = false;
+        expandBtn.addEventListener('click', () => {
+          expanded = !expanded;
+          const hiddenPanels = grid.querySelectorAll('.hidden-panel');
+          hiddenPanels.forEach(p => p.classList.toggle('show', expanded));
+          expandBtn.textContent = expanded ? '− CLOSE' : `+ MORE (${hiddenCount})`;
+        });
+      }
 
       // Track clicks
       grid.addEventListener('click', (e) => {
