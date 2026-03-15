@@ -111,6 +111,31 @@
       line-height: 1.4;
     }
 
+    /* Badge */
+    .panel-badge {
+      position: absolute;
+      top: 8px;
+      left: 8px;
+      padding: 2px 8px;
+      font-family: 'Outfit', sans-serif;
+      font-weight: 700;
+      font-size: 0.6rem;
+      letter-spacing: 0.08em;
+      border-radius: 2px;
+      z-index: 2;
+      pointer-events: none;
+    }
+
+    .badge-new {
+      background: #fff;
+      color: #000;
+    }
+
+    .badge-hot {
+      background: #ff3b30;
+      color: #fff;
+    }
+
     /* モバイル: hover がないデバイス */
     @media (hover: none) {
       .panel-overlay {
@@ -156,6 +181,13 @@
       .header-copy {
         font-size: 0.5rem;
       }
+
+      .panel-badge {
+        top: 4px;
+        left: 4px;
+        font-size: 0.5rem;
+        padding: 1px 5px;
+      }
     }
   </style>
 </head>
@@ -168,6 +200,7 @@
 
   <script>
     const SHEET_CSV = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vTK9SAFKJrv3hyi6mulfb3HAaiAYmu0dKx8MOw5gwX4LJtOanKVMoti5DoDVRwix3DHsKX9KqsBF9si/pub?output=csv';
+    const CLICKS_API = 'https://studio-clicks.hiroshinagano0113.workers.dev';
 
     function parseCSV(text) {
       const lines = text.split('\n').filter(l => l.trim());
@@ -211,17 +244,51 @@
         .toLowerCase() || 'item';
     }
 
-    function renderGrid(items) {
+    function renderGrid(items, hotSlugs) {
       const grid = document.getElementById('grid');
-      let html = '';
+      const hotSet = new Set(hotSlugs);
 
-      for (const item of items) {
+      // NEW = first item, HOT = top 3 by clicks
+      // Reorder: NEW first, then HOT items, then rest
+      const newItem = items[0];
+      const newSlug = newItem ? slugify(newItem.url) : '';
+
+      const hotItems = [];
+      const restItems = [];
+
+      for (let i = 0; i < items.length; i++) {
+        const item = items[i];
+        const slug = slugify(item.url);
+        if (i === 0) continue; // skip NEW item (handled separately)
+        if (hotSet.has(slug)) {
+          hotItems.push(item);
+        } else {
+          restItems.push(item);
+        }
+      }
+
+      // Final order: NEW → HOT → rest
+      const ordered = [];
+      if (newItem) ordered.push({ ...newItem, badge: 'new' });
+      for (const item of hotItems) ordered.push({ ...item, badge: 'hot' });
+      for (const item of restItems) ordered.push(item);
+
+      let html = '';
+      for (const item of ordered) {
         const title = item.title;
         const href = item.url ? ` href="${item.url}" target="_blank" rel="noopener"` : '';
         const slug = slugify(item.url);
         const thumbUrl = `thumbs/${slug}.webp`;
 
-        html += `<a${href} class="panel">` +
+        let badgeHtml = '';
+        if (item.badge === 'new') {
+          badgeHtml = '<span class="panel-badge badge-new">NEW</span>';
+        } else if (item.badge === 'hot') {
+          badgeHtml = '<span class="panel-badge badge-hot">HOT</span>';
+        }
+
+        html += `<a${href} class="panel" data-slug="${slug}">` +
+          badgeHtml +
           `<img src="${thumbUrl}" alt="${title}" loading="lazy" onerror="this.style.display='none';this.nextElementSibling.style.display='block'">` +
           `<div class="panel-placeholder" style="background:${item.bg};display:none"></div>` +
           `<div class="panel-overlay"><span class="panel-title">${title}</span></div>` +
@@ -229,17 +296,29 @@
       }
 
       grid.innerHTML = html;
+
+      // Track clicks
+      grid.addEventListener('click', (e) => {
+        const panel = e.target.closest('.panel');
+        if (!panel) return;
+        const slug = panel.dataset.slug;
+        if (slug) {
+          navigator.sendBeacon(`${CLICKS_API}/click?slug=${encodeURIComponent(slug)}`);
+        }
+      });
     }
 
-    fetch(SHEET_CSV)
-      .then(r => r.text())
-      .then(text => {
-        const items = parseCSV(text);
-        renderGrid(items);
-      })
-      .catch(err => {
-        console.error('CSV fetch error:', err);
-      });
+    // Fetch CSV and hot items in parallel
+    Promise.all([
+      fetch(SHEET_CSV).then(r => r.text()),
+      fetch(`${CLICKS_API}/hot?n=3`).then(r => r.json()).catch(() => [])
+    ]).then(([csvText, hotData]) => {
+      const items = parseCSV(csvText);
+      const hotSlugs = hotData.map(h => h.slug);
+      renderGrid(items, hotSlugs);
+    }).catch(err => {
+      console.error('Load error:', err);
+    });
   </script>
 </body>
 </html>

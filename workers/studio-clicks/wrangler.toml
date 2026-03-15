@@ -1,0 +1,7 @@
+name = "studio-clicks"
+main = "src/index.js"
+compatibility_date = "2024-01-01"
+
+[[kv_namespaces]]
+binding = "CLICKS"
+id = "05f095880e07480faf3cd779fd7d0080"
