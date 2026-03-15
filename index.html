@@ -244,34 +244,42 @@
         .toLowerCase() || 'item';
     }
 
-    function renderGrid(items, hotSlugs) {
+    function renderGrid(items, hotSlugs, clickCounts) {
       const grid = document.getElementById('grid');
       const hotSet = new Set(hotSlugs);
 
-      // NEW = first item, HOT = top 3 by clicks
-      // Reorder: NEW first, then HOT items, then rest
-      const newItem = items[0];
-      const newSlug = newItem ? slugify(newItem.url) : '';
-
-      const hotItems = [];
-      const restItems = [];
-
-      for (let i = 0; i < items.length; i++) {
-        const item = items[i];
-        const slug = slugify(item.url);
-        if (i === 0) continue; // skip NEW item (handled separately)
-        if (hotSet.has(slug)) {
-          hotItems.push(item);
-        } else {
-          restItems.push(item);
-        }
+      // Build click count map (slug → count)
+      const countMap = {};
+      for (const c of clickCounts) {
+        countMap[c.slug] = c.count;
       }
 
-      // Final order: NEW → HOT → rest
+      // NEW = first item in spreadsheet
+      const newItem = items[0];
+
+      // Sort all items (except NEW) by click count desc, then by spreadsheet order
+      const rest = items.slice(1).map((item, i) => ({
+        ...item,
+        _origIndex: i,
+        _clicks: countMap[slugify(item.url)] || 0
+      }));
+      rest.sort((a, b) => {
+        if (b._clicks !== a._clicks) return b._clicks - a._clicks;
+        return a._origIndex - b._origIndex;
+      });
+
+      // Final order: NEW → sorted rest (top 3 get HOT badge)
       const ordered = [];
       if (newItem) ordered.push({ ...newItem, badge: 'new' });
-      for (const item of hotItems) ordered.push({ ...item, badge: 'hot' });
-      for (const item of restItems) ordered.push(item);
+      for (let i = 0; i < rest.length; i++) {
+        const item = rest[i];
+        const slug = slugify(item.url);
+        if (hotSet.has(slug)) {
+          ordered.push({ ...item, badge: 'hot' });
+        } else {
+          ordered.push(item);
+        }
+      }
 
       let html = '';
       for (const item of ordered) {
@@ -308,14 +316,15 @@
       });
     }
 
-    // Fetch CSV and hot items in parallel
+    // Fetch CSV, hot slugs, and all click counts in parallel
     Promise.all([
       fetch(SHEET_CSV).then(r => r.text()),
-      fetch(`${CLICKS_API}/hot?n=3`).then(r => r.json()).catch(() => [])
-    ]).then(([csvText, hotData]) => {
+      fetch(`${CLICKS_API}/hot?n=3`).then(r => r.json()).catch(() => []),
+      fetch(`${CLICKS_API}/all`).then(r => r.json()).catch(() => [])
+    ]).then(([csvText, hotData, allCounts]) => {
       const items = parseCSV(csvText);
       const hotSlugs = hotData.map(h => h.slug);
-      renderGrid(items, hotSlugs);
+      renderGrid(items, hotSlugs, allCounts);
     }).catch(err => {
       console.error('Load error:', err);
     });
