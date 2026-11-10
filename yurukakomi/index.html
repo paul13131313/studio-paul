@@ -1,0 +1,420 @@
+<!doctype html>
+<html lang="ja">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>ゆるかこみ</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<meta name="description" content="人を◯と線でつないで、コミュニティをゆるく囲む。人間関係を図にするツール。">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Zen+Maru+Gothic:wght@500;700&family=Zen+Kaku+Gothic+New:wght@400;500;700&display=swap">
+<style>
+/* Layout: 上に名前、左に大きなマップ（方眼の紙）、右（スマホは下）に操作パネル */
+:root{
+  --bg:#ECEFF2; --paper:#F8FAFB; --ink:#1E2630; --muted:#65707C; --line:#B5BEC8; --dot:#D5DBE1;
+  --accent:#2F6FD6; --onaccent:#FFFFFF; --panel:#FFFFFF; --border:#D8DDE3; --danger:#C2412D;
+  --display:"Zen Maru Gothic","Hiragino Maru Gothic ProN",sans-serif;
+  --body:"Zen Kaku Gothic New","Hiragino Sans","Noto Sans JP",sans-serif;
+}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){
+  --bg:#12161B; --paper:#171C22; --ink:#E5E9ED; --muted:#96A0AB; --line:#4A5560; --dot:#252C34;
+  --accent:#7AA7F1; --onaccent:#0E1420; --panel:#1B2128; --border:#2C343D; --danger:#F07A66; color-scheme:dark}}
+:root[data-theme="dark"]{
+  --bg:#12161B; --paper:#171C22; --ink:#E5E9ED; --muted:#96A0AB; --line:#4A5560; --dot:#252C34;
+  --accent:#7AA7F1; --onaccent:#0E1420; --panel:#1B2128; --border:#2C343D; --danger:#F07A66; color-scheme:dark}
+body{background:var(--bg);color:var(--ink);font-family:var(--body);font-size:14px;line-height:1.5;
+  padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));padding-block:20px}
+.wrap{display:grid;grid-template-columns:minmax(0,1fr) 300px;gap:16px;max-width:1320px;margin:0 auto}
+@media (max-width:860px){.wrap{grid-template-columns:minmax(0,1fr)}}
+header{grid-column:1/-1;display:flex;flex-wrap:wrap;align-items:baseline;gap:4px 16px}
+h1{font-family:var(--display);font-weight:700;font-size:26px;margin:0;letter-spacing:.04em}
+h1 b{display:inline-block;width:.62em;height:.62em;border:2.5px solid currentColor;border-radius:50%;margin-left:.15em;vertical-align:.02em}
+.sub{color:var(--muted);font-size:13px}
+.stage{background:var(--paper);border:1px solid var(--border);border-radius:14px;overflow:hidden;min-width:0;position:relative}
+#map{display:block;width:100%;height:clamp(440px,72vh,780px);touch-action:none;user-select:none;-webkit-user-select:none;cursor:grab}
+.tools{position:absolute;right:10px;top:10px;display:flex;flex-direction:column;gap:6px}
+.tools button{width:38px;height:38px;padding:0;font-size:17px;background:var(--panel)}
+.tidy{position:absolute;left:10px;top:10px;display:flex;gap:6px;flex-wrap:wrap}
+.tidy button{background:var(--panel)}
+.badge{position:absolute;left:50%;top:56px;transform:translateX(-50%);background:var(--accent);color:var(--onaccent);font-size:12px;padding:5px 12px;border-radius:99px;font-weight:700;white-space:nowrap}
+.toast{position:absolute;left:50%;bottom:12px;transform:translateX(-50%);width:min(92%,440px);background:var(--panel);border:1px solid var(--border);
+  border-radius:12px;padding:10px 12px;box-shadow:0 6px 24px rgba(0,0,0,.12);display:flex;flex-direction:column;gap:8px}
+.toast p{margin:0;font-size:13px}
+.hint{position:absolute;left:12px;bottom:10px;font-size:12px;color:var(--muted);pointer-events:none}
+aside{display:flex;flex-direction:column;gap:12px;min-width:0}
+.card{background:var(--panel);border:1px solid var(--border);border-radius:12px;padding:14px;display:flex;flex-direction:column;gap:10px}
+.card h2{font-family:var(--display);font-size:14px;margin:0;letter-spacing:.06em}
+.lab{font-size:12px;color:var(--muted)}
+input[type=text],textarea{font:inherit;color:var(--ink);background:var(--bg);border:1px solid var(--border);border-radius:8px;padding:8px 10px;width:100%;box-sizing:border-box;min-width:0}
+textarea{font-size:12px;height:110px;resize:vertical;font-family:ui-monospace,monospace}
+.row{display:flex;gap:8px;flex-wrap:wrap;align-items:center}
+.row input[type=text]{flex:1}
+button{font:inherit;font-size:13px;font-weight:500;color:var(--ink);background:var(--bg);border:1px solid var(--border);border-radius:8px;padding:7px 12px;cursor:pointer}
+button:hover{border-color:var(--muted)}
+button:focus-visible,input:focus-visible,textarea:focus-visible,[tabindex]:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+button.primary{background:var(--accent);border-color:var(--accent);color:var(--onaccent)}
+button.danger{color:var(--danger)}
+button.on{border-color:var(--accent);color:var(--accent)}
+.chips{display:flex;flex-wrap:wrap;gap:6px}
+.chip{font-size:12px;padding:4px 10px;border-radius:99px;border:1.5px solid var(--c);background:transparent}
+.chip[aria-pressed="true"]{background:var(--c);color:#fff}
+.empty{color:var(--muted);font-size:13px;margin:0}
+.glist{display:flex;flex-direction:column;gap:6px}
+.gitem{display:grid;grid-template-columns:auto minmax(0,1fr) auto auto auto;gap:6px;align-items:center}
+.gitem .sw{width:20px;height:20px;border-radius:50%;background:var(--c);border:none;padding:0}
+.gitem input{padding:5px 8px;font-size:13px}
+.gitem .n{font-size:12px;color:var(--muted);font-variant-numeric:tabular-nums;min-width:1.5em;text-align:right}
+.gitem button.s{padding:4px 7px;font-size:11px}
+label.chk{display:flex;gap:6px;align-items:center;font-size:13px}
+.howto{font-size:12.5px;color:var(--muted);margin:0;padding-left:1.2em;display:flex;flex-direction:column;gap:3px}
+.nlabel{fill:var(--ink);font-family:var(--body);font-size:13px;font-weight:500;paint-order:stroke;stroke:var(--paper);stroke-width:4px;stroke-linejoin:round}
+.glabel{font-family:var(--display);font-weight:700;font-size:14px;letter-spacing:.06em;paint-order:stroke;stroke:var(--paper);stroke-width:4px;stroke-linejoin:round}
+.node{cursor:pointer}
+.node .disc{fill:var(--paper);stroke:var(--ink);stroke-width:1.5}
+.node.center .disc{fill:var(--ink);stroke:none}
+.node.center text.in{fill:var(--paper);font-family:var(--display);font-weight:700;font-size:15px}
+.node.sel .disc{stroke:var(--accent);stroke-width:3.5}
+.edge{stroke:var(--line);stroke-width:1.4}
+.edge.hot{stroke:var(--accent);stroke-width:2}
+</style>
+</head>
+<body>
+
+<div class="wrap">
+  <header>
+    <h1>ゆるかこみ<b></b></h1>
+    <span class="sub">人を◯と線でつないで、コミュニティをゆるく囲む。重なる人は、重なったまま描けます。</span>
+  </header>
+
+  <div class="stage" id="stage">
+    <svg id="map" aria-label="関係図">
+      <defs>
+        <pattern id="dots" width="24" height="24" patternUnits="userSpaceOnUse"><circle cx="2" cy="2" r="1.3" fill="var(--dot)"/></pattern>
+        <filter id="goo" filterUnits="userSpaceOnUse" color-interpolation-filters="sRGB">
+          <feGaussianBlur in="SourceGraphic" stdDeviation="11" result="b"/>
+          <feColorMatrix in="b" type="matrix" values="1 0 0 0 0  0 1 0 0 0  0 0 1 0 0  0 0 0 28 -11" result="g"/>
+          <feColorMatrix in="g" type="matrix" values="1 0 0 0 0  0 1 0 0 0  0 0 1 0 0  0 0 0 .15 0" result="fill"/>
+          <feMorphology in="g" operator="erode" radius="1.6" result="er"/>
+          <feComposite in="g" in2="er" operator="out" result="ra"/>
+          <feColorMatrix in="ra" type="matrix" values="1 0 0 0 0  0 1 0 0 0  0 0 1 0 0  0 0 0 .8 0" result="ring"/>
+          <feMerge><feMergeNode in="fill"/><feMergeNode in="ring"/></feMerge>
+        </filter>
+      </defs>
+      <rect x="-20000" y="-20000" width="40000" height="40000" fill="url(#dots)" id="bg"/>
+      <g id="L-groups"></g><g id="L-edges"></g><g id="L-nodes"></g><g id="L-glabels"></g>
+    </svg>
+    <div class="tidy"><button id="btnTidy" title="コミュニティごとに寄せて並べ直す">整える</button></div>
+    <div class="tools">
+      <button id="zin" aria-label="拡大">＋</button>
+      <button id="zout" aria-label="縮小">−</button>
+      <button id="zfit" aria-label="全体を見る">⤢</button>
+    </div>
+    <div class="badge" id="badge" hidden>つなぐ相手の◯をタップ</div>
+    <div class="toast" id="toast" hidden></div>
+    <div class="hint" id="hint">◯をドラッグで移動・タップで選択 ／ 余白ドラッグで画面を動かす</div>
+  </div>
+
+  <aside>
+    <div class="card">
+      <h2>選択中の人</h2>
+      <div id="selBody" style="display:flex;flex-direction:column;gap:10px"></div>
+    </div>
+
+    <div class="card">
+      <h2>人を足す</h2>
+      <div class="row"><input type="text" id="newName" placeholder="名前"><button class="primary" id="addPerson">置く</button></div>
+      <label class="chk"><input type="checkbox" id="linkCenter" checked> 中心の人と線でつなぐ</label>
+    </div>
+
+    <div class="card">
+      <h2>コミュニティ</h2>
+      <div class="glist" id="glist"></div>
+      <div class="row"><input type="text" id="newGroup" placeholder="新しいコミュニティ名"><button id="addGroup">追加</button></div>
+      <ul class="howto">
+        <li>1人が何個のコミュニティに入ってもOK。◯のまわりの色の帯が所属の数です。</li>
+        <li>◯を別の囲いに重ねて離すと「入れる？」、囲いから遠ざけると「外す？」と聞きます。</li>
+        <li>目のボタンでそのコミュニティだけを浮かび上がらせます。</li>
+      </ul>
+    </div>
+
+    <div class="card">
+      <h2>データ</h2>
+      <p class="empty" style="font-size:12px">図はこのブラウザに自動で保存されます。別の端末へ移すときは書き出し→読み込みで。</p>
+      <div class="row">
+        <button id="exp">データをコピー</button>
+        <button id="impToggle">読み込む</button>
+      </div>
+      <div id="impBox" hidden style="display:flex;flex-direction:column;gap:8px">
+        <textarea id="impText" placeholder="コピーしたデータを貼り付け"></textarea>
+        <div class="row"><button class="primary" id="impGo">この内容で読み込む</button></div>
+      </div>
+      <div class="row">
+        <button id="toSample">サンプルを見る</button>
+        <button class="danger" id="toBlank">まっさらにする</button>
+      </div>
+      <p class="empty" id="dataMsg" style="font-size:12px" hidden></p>
+    </div>
+  </aside>
+</div>
+
+<script>
+const KEY='yurukakomi-v1';
+const PAL=['#E07A3F','#3A8DDB','#8F62D8','#2E9E78','#D8487C','#C29B16','#3FAFC2','#7C8B35','#B5654A','#5C6FD6'];
+const uid=()=>Math.random().toString(36).slice(2,9);
+const sample=()=>({
+  nodes:[
+    {id:'me',name:'わたし',x:0,y:0,center:true},
+    {id:'mom',name:'母',x:-300,y:-170},{id:'sis',name:'姉',x:-210,y:-290},
+    {id:'ken',name:'ケン',x:210,y:-170},{id:'aya',name:'アヤ',x:150,y:-320},{id:'sho',name:'ショウ',x:330,y:-290},
+    {id:'tanaka',name:'田中さん',x:430,y:-40},{id:'saki',name:'サキ',x:290,y:110},
+    {id:'ryo',name:'リョウ',x:230,y:290},{id:'dai',name:'ダイ',x:60,y:300},
+    {id:'yui',name:'ユイ',x:-260,y:160}
+  ],
+  edges:[['me','mom'],['me','sis'],['me','ken'],['me','aya'],['me','saki'],['me','tanaka'],['me','ryo'],['me','dai'],['me','yui'],
+    ['mom','sis'],['ken','aya'],['ken','sho'],['ken','tanaka'],['saki','tanaka'],['saki','ryo'],['ryo','dai']],
+  groups:[
+    {id:'g1',name:'家族',c:0,members:['mom','sis']},
+    {id:'g2',name:'大学の友達',c:1,members:['ken','aya','sho']},
+    {id:'g3',name:'会社',c:2,members:['ken','tanaka','saki']},
+    {id:'g4',name:'フットサル',c:3,members:['saki','ryo','dai']}
+  ]
+});
+const blank=()=>({nodes:[{id:'me',name:'わたし',x:0,y:0,center:true}],edges:[],groups:[]});
+const valid=d=>d&&Array.isArray(d.nodes)&&Array.isArray(d.edges)&&Array.isArray(d.groups)&&d.nodes.every(n=>n.id&&typeof n.x==='number');
+
+let S; try{S=JSON.parse(localStorage.getItem(KEY))}catch(e){}
+if(!valid(S))S=sample();
+let V={x:-520,y:-420,w:1040,h:820};
+let sel=null,connecting=false,focusG=null,armed=null;
+const save=()=>{try{localStorage.setItem(KEY,JSON.stringify(S))}catch(e){}};
+const $=id=>document.getElementById(id);
+const svg=$('map'),NS='http://www.w3.org/2000/svg';
+const el=(t,a={})=>{const e=document.createElementNS(NS,t);for(const k in a)e.setAttribute(k,a[k]);return e};
+const h=(t,props={},kids=[])=>{const e=document.createElement(t);Object.assign(e,props);kids.forEach(k=>e.append(k));return e};
+const N=id=>S.nodes.find(n=>n.id===id);
+const color=g=>PAL[g.c%PAL.length];
+const groupsOf=id=>S.groups.filter(g=>g.members.includes(id));
+const R=n=>n.center?32:22;
+const dist=(a,b)=>Math.hypot(a.x-b.x,a.y-b.y);
+
+function mst(ms){
+  if(ms.length<2)return[];
+  const inT=[ms[0]],out=ms.slice(1),E=[];
+  while(out.length){let bd=Infinity,bp=null,bi=-1;
+    for(const a of inT)for(let i=0;i<out.length;i++){const d=dist(a,out[i]);if(d<bd){bd=d;bp=[a,out[i]];bi=i}}
+    E.push(bp);inT.push(out[bi]);out.splice(bi,1)}
+  return E;
+}
+
+function setView(){
+  svg.setAttribute('viewBox',`${V.x} ${V.y} ${V.w} ${V.h}`);
+  const f=$('goo');f.setAttribute('x',V.x-400);f.setAttribute('y',V.y-400);f.setAttribute('width',V.w+800);f.setAttribute('height',V.h+800);
+}
+
+function render(){
+  setView();
+  const LG=$('L-groups'),LE=$('L-edges'),LN=$('L-nodes'),LL=$('L-glabels');
+  LG.replaceChildren();LE.replaceChildren();LN.replaceChildren();LL.replaceChildren();
+  S.groups.forEach(g=>{
+    const ms=g.members.map(N).filter(Boolean);if(!ms.length)return;
+    const c=color(g),dim=focusG&&focusG!==g.id;
+    const wrap=el('g',{opacity:dim?.18:1});
+    const gg=el('g',{filter:'url(#goo)'});
+    ms.forEach(m=>gg.append(el('circle',{cx:m.x,cy:m.y,r:R(m)+20,fill:c})));
+    mst(ms).forEach(([a,b])=>gg.append(el('line',{x1:a.x,y1:a.y,x2:b.x,y2:b.y,stroke:c,'stroke-width':30,'stroke-linecap':'round'})));
+    wrap.append(gg);LG.append(wrap);
+    const top=ms.reduce((a,b)=>b.y<a.y?b:a);
+    const t=el('text',{x:top.x,y:top.y-R(top)-30,'text-anchor':'middle',class:'glabel',fill:c,opacity:dim?.25:1});
+    t.textContent=g.name;LL.append(t);
+  });
+  const fset=focusG&&new Set((S.groups.find(g=>g.id===focusG)||{members:[]}).members);
+  S.edges.forEach(([a,b])=>{const A=N(a),B=N(b);if(!A||!B)return;
+    const hot=sel&&(a===sel||b===sel);
+    const ln=el('line',{x1:A.x,y1:A.y,x2:B.x,y2:B.y,class:'edge'+(hot?' hot':'')});
+    if(fset&&!(fset.has(a)&&fset.has(b)))ln.setAttribute('opacity',.25);
+    LE.append(ln)});
+  S.nodes.forEach(n=>{
+    const g=el('g',{class:'node'+(n.center?' center':'')+(sel===n.id?' sel':''),transform:`translate(${n.x},${n.y})`,tabindex:0,role:'button','aria-label':n.name});
+    if(fset&&!fset.has(n.id))g.setAttribute('opacity',.3);
+    const gs=groupsOf(n.id),r=R(n)+5,C=2*Math.PI*r,k=gs.length;
+    gs.forEach((x,i)=>g.append(el('circle',{r,fill:'none',stroke:color(x),'stroke-width':5,
+      'stroke-dasharray':`${C/k-(k>1?5:0)} ${C}`,'stroke-dashoffset':-i*C/k,transform:'rotate(-90)'})));
+    g.append(el('circle',{r:R(n),class:'disc'}));
+    if(n.center){const t=el('text',{class:'in','text-anchor':'middle',dy:'.35em'});t.textContent=n.name.length>4?n.name.slice(0,4):n.name;g.append(t);
+      if(n.name.length>4){const t2=el('text',{class:'nlabel','text-anchor':'middle',y:R(n)+20});t2.textContent=n.name;g.append(t2)}}
+    else{const t=el('text',{class:'nlabel','text-anchor':'middle',y:R(n)+22});t.textContent=n.name;g.append(t)}
+    g.addEventListener('pointerdown',ev=>dragNode(ev,n));
+    g.addEventListener('keydown',ev=>{if(ev.key==='Enter'||ev.key===' '){ev.preventDefault();tap(n)}});
+    LN.append(g);
+  });
+  $('badge').hidden=!connecting;
+  panel();
+}
+
+/* ---- pointer ---- */
+const pt=e=>{const p=svg.createSVGPoint();p.x=e.clientX;p.y=e.clientY;return p.matrixTransform(svg.getScreenCTM().inverse())};
+function dragNode(ev,n){
+  ev.stopPropagation();ev.preventDefault();hideToast();
+  const s=pt(ev),ox=n.x,oy=n.y;let moved=false;
+  const mv=e=>{const q=pt(e),dx=q.x-s.x,dy=q.y-s.y;if(!moved&&Math.hypot(dx,dy)>5)moved=true;
+    if(moved){n.x=ox+dx;n.y=oy+dy;render()}};
+  const up=()=>{removeEventListener('pointermove',mv);removeEventListener('pointerup',up);removeEventListener('pointercancel',up);
+    if(moved){save();if(!n.center)suggest(n)}else tap(n)};
+  addEventListener('pointermove',mv);addEventListener('pointerup',up);addEventListener('pointercancel',up);
+}
+$('bg').addEventListener('pointerdown',ev=>{
+  ev.preventDefault();const sx=ev.clientX,sy=ev.clientY,v0={...V};let moved=false;
+  const sc=Math.max(V.w/svg.clientWidth,V.h/svg.clientHeight);
+  const mv=e=>{const dx=e.clientX-sx,dy=e.clientY-sy;if(!moved&&Math.hypot(dx,dy)>5)moved=true;
+    if(moved){V.x=v0.x-dx*sc;V.y=v0.y-dy*sc;setView()}};
+  const up=()=>{removeEventListener('pointermove',mv);removeEventListener('pointerup',up);removeEventListener('pointercancel',up);
+    if(!moved){sel=null;connecting=false;armed=null;hideToast();render()}};
+  addEventListener('pointermove',mv);addEventListener('pointerup',up);addEventListener('pointercancel',up);
+});
+function zoom(f,cx,cy){if(cx==null){cx=V.x+V.w/2;cy=V.y+V.h/2}
+  const w=Math.min(Math.max(V.w*f,300),8000),k=w/V.w;V.x=cx-(cx-V.x)*k;V.y=cy-(cy-V.y)*k;V.w=w;V.h*=k;setView()}
+svg.addEventListener('wheel',e=>{e.preventDefault();const p=pt(e);zoom(e.deltaY>0?1.12:1/1.12,p.x,p.y)},{passive:false});
+function fit(){if(!S.nodes.length)return;
+  const xs=S.nodes.map(n=>n.x),ys=S.nodes.map(n=>n.y),pad=110;
+  const x0=Math.min(...xs)-pad,x1=Math.max(...xs)+pad,y0=Math.min(...ys)-pad-30,y1=Math.max(...ys)+pad;
+  V={x:x0,y:y0,w:Math.max(x1-x0,500),h:Math.max(y1-y0,400)};if(V.w===500){V.x=(x0+x1)/2-250}setView()}
+$('zin').onclick=()=>zoom(1/1.25);$('zout').onclick=()=>zoom(1.25);$('zfit').onclick=fit;
+
+function tap(n){
+  if(connecting&&sel&&sel!==n.id){
+    const i=S.edges.findIndex(([a,b])=>(a===sel&&b===n.id)||(a===n.id&&b===sel));
+    if(i>=0)S.edges.splice(i,1);else S.edges.push([sel,n.id]);
+    connecting=false;save();
+  }else{sel=n.id;connecting=false}
+  armed=null;render();
+}
+
+/* ---- 重ねたら入れる／離したら外す ---- */
+let toastTimer;
+function hideToast(){$('toast').hidden=true;clearTimeout(toastTimer)}
+function suggest(n){
+  const join=S.groups.filter(g=>!g.members.includes(n.id)&&g.members.map(N).filter(Boolean).some(m=>dist(m,n)<R(m)+R(n)+42));
+  const leave=S.groups.filter(g=>{if(!g.members.includes(n.id))return false;
+    const o=g.members.filter(m=>m!==n.id).map(N).filter(Boolean);return o.length&&o.every(m=>dist(m,n)>260)});
+  if(!join.length&&!leave.length)return;
+  const T=$('toast');T.replaceChildren();
+  T.append(h('p',{textContent:`「${n.name}」を`}));
+  const row=h('div',{className:'row'});
+  join.forEach(g=>{const b=h('button',{className:'primary',textContent:`${g.name}に入れる`});
+    b.onclick=()=>{g.members.push(n.id);save();hideToast();render()};row.append(b)});
+  leave.forEach(g=>{const b=h('button',{textContent:`${g.name}から外す`});
+    b.onclick=()=>{g.members=g.members.filter(m=>m!==n.id);save();hideToast();render()};row.append(b)});
+  const x=h('button',{textContent:'そのまま'});x.onclick=hideToast;row.append(x);
+  T.append(row);T.hidden=false;clearTimeout(toastTimer);toastTimer=setTimeout(hideToast,9000);
+}
+
+/* ---- 整える（力学レイアウト） ---- */
+function tidy(){
+  const ns=S.nodes;if(ns.length<2){fit();return}
+  const cen=ns.find(n=>n.center);
+  const vel=new Map(ns.map(n=>[n.id,{x:0,y:0}]));
+  let a=1;const reduce=matchMedia('(prefers-reduced-motion: reduce)').matches;
+  const step=()=>{
+    for(let i=0;i<ns.length;i++)for(let j=i+1;j<ns.length;j++){
+      const A=ns[i],B=ns[j];let dx=A.x-B.x,dy=A.y-B.y,d2=dx*dx+dy*dy;
+      if(d2<1){dx=Math.random()-.5;dy=Math.random()-.5;d2=1}
+      const d=Math.sqrt(d2);let f=26000/d2;
+      const shared=groupsOf(A.id).some(g=>g.members.includes(B.id));
+      if(!shared&&d<240)f+= (240-d)*.08;
+      const va=vel.get(A.id),vb=vel.get(B.id);va.x+=dx/d*f*a;va.y+=dy/d*f*a;vb.x-=dx/d*f*a;vb.y-=dy/d*f*a}
+    S.edges.forEach(([p,q])=>{const A=N(p),B=N(q);if(!A||!B)return;const dx=B.x-A.x,dy=B.y-A.y,d=Math.hypot(dx,dy)||1;
+      const L=(A.center||B.center)?230:150,f=(d-L)*.015*a;
+      const va=vel.get(A.id),vb=vel.get(B.id);va.x+=dx/d*f;va.y+=dy/d*f;vb.x-=dx/d*f;vb.y-=dy/d*f});
+    S.groups.forEach(g=>{const ms=g.members.map(N).filter(Boolean);if(ms.length<2)return;
+      const cx=ms.reduce((s,m)=>s+m.x,0)/ms.length,cy=ms.reduce((s,m)=>s+m.y,0)/ms.length;
+      ms.forEach(m=>{const v=vel.get(m.id);v.x+=(cx-m.x)*.035*a;v.y+=(cy-m.y)*.035*a})});
+    ns.forEach(n=>{const v=vel.get(n.id);
+      if(n.center){v.x+=(0-n.x)*.05;v.y+=(0-n.y)*.05}else if(cen){v.x+=(cen.x-n.x)*.002;v.y+=(cen.y-n.y)*.002}
+      v.x*=.6;v.y*=.6;n.x+=Math.max(-40,Math.min(40,v.x));n.y+=Math.max(-40,Math.min(40,v.y))});
+    a*=.985;
+  };
+  if(reduce){for(let i=0;i<260;i++)step();save();render();fit();return}
+  let t=0;const loop=()=>{for(let i=0;i<5;i++)step();render();t++;if(t<55)requestAnimationFrame(loop);else{save();fit()}};loop();
+}
+$('btnTidy').onclick=()=>{hideToast();tidy()};
+
+/* ---- パネル ---- */
+function panel(){
+  const B=$('selBody');B.replaceChildren();
+  const n=sel&&N(sel);
+  if(!n){B.append(h('p',{className:'empty',textContent:'マップの◯をタップすると、名前・所属コミュニティ・線を編集できます。'}))}
+  else{
+    const inp=h('input',{type:'text',id:'selName',value:n.name});
+    inp.addEventListener('change',()=>{n.name=inp.value.trim()||n.name;save();render()});
+    B.append(h('div',{className:'lab',textContent:'名前'}),inp);
+    if(!n.center){
+      B.append(h('div',{className:'lab',textContent:S.groups.length?'所属するコミュニティ（いくつでも）':'コミュニティを下で作ると、ここで所属を選べます'}));
+      const ch=h('div',{className:'chips'});
+      S.groups.forEach(g=>{const on=g.members.includes(n.id);
+        const c=h('button',{className:'chip',textContent:g.name});c.style.setProperty('--c',color(g));c.setAttribute('aria-pressed',on);
+        c.onclick=()=>{if(on)g.members=g.members.filter(m=>m!==n.id);else g.members.push(n.id);save();render()};ch.append(c)});
+      B.append(ch);
+    }
+    const row=h('div',{className:'row'});
+    const cn=h('button',{className:connecting?'on':'',textContent:connecting?'つなぐのをやめる':'線をつなぐ／外す'});
+    cn.onclick=()=>{connecting=!connecting;render()};row.append(cn);
+    if(!n.center){const del=h('button',{className:'danger',textContent:armed==='del'?'本当に消す':'この人を消す'});
+      del.onclick=()=>{if(armed!=='del'){armed='del';panel();return}armed=null;
+        S.nodes=S.nodes.filter(x=>x.id!==n.id);S.edges=S.edges.filter(e=>!e.includes(n.id));
+        S.groups.forEach(g=>g.members=g.members.filter(m=>m!==n.id));sel=null;save();render()};row.append(del)}
+    B.append(row);
+  }
+  const GL=$('glist');GL.replaceChildren();
+  if(!S.groups.length)GL.append(h('p',{className:'empty',textContent:'まだコミュニティがありません。'}));
+  S.groups.forEach(g=>{
+    const it=h('div',{className:'gitem'});it.style.setProperty('--c',color(g));
+    const sw=h('button',{className:'sw',title:'色を変える'});sw.setAttribute('aria-label',`${g.name}の色を変える`);
+    sw.onclick=()=>{g.c=(g.c+1)%PAL.length;save();render()};
+    const nm=h('input',{type:'text',value:g.name,id:'g-'+g.id});nm.setAttribute('aria-label','コミュニティ名');
+    nm.addEventListener('change',()=>{g.name=nm.value.trim()||g.name;save();render()});
+    const cnt=h('span',{className:'n',textContent:g.members.length});
+    const fo=h('button',{className:'s'+(focusG===g.id?' on':''),textContent:'◉',title:'このコミュニティだけ見る'});
+    fo.setAttribute('aria-label',`${g.name}だけを強調`);fo.onclick=()=>{focusG=focusG===g.id?null:g.id;render()};
+    const del=h('button',{className:'s danger',textContent:armed==='g'+g.id?'消す':'×'});del.setAttribute('aria-label',`${g.name}を解散`);
+    del.onclick=()=>{if(armed!=='g'+g.id){armed='g'+g.id;panel();return}armed=null;
+      S.groups=S.groups.filter(x=>x!==g);if(focusG===g.id)focusG=null;save();render()};
+    it.append(sw,nm,cnt,fo,del);GL.append(it);
+  });
+  $('toBlank').textContent=armed==='blank'?'本当にまっさらにする':'まっさらにする';
+  $('toSample').textContent=armed==='sample'?'いまの図を消してサンプルにする':'サンプルを見る';
+}
+$('addPerson').onclick=()=>{
+  const v=$('newName').value.trim();if(!v){$('newName').focus();return}
+  const base=sel&&N(sel)||{x:V.x+V.w/2,y:V.y+V.h/2};
+  const ang=Math.random()*Math.PI*2,id='n'+uid();
+  S.nodes.push({id,name:v,x:base.x+Math.cos(ang)*120,y:base.y+Math.sin(ang)*120});
+  const cen=S.nodes.find(n=>n.center);
+  if($('linkCenter').checked&&cen)S.edges.push([cen.id,id]);
+  if(sel&&N(sel)&&!N(sel).center)groupsOf(sel).forEach(g=>g.members.push(id));
+  $('newName').value='';sel=id;save();render();
+};
+$('newName').addEventListener('keydown',e=>{if(e.key==='Enter'&&!e.isComposing)$('addPerson').click()});
+$('addGroup').onclick=()=>{
+  const v=$('newGroup').value.trim();if(!v){$('newGroup').focus();return}
+  const used=S.groups.map(g=>g.c);let c=PAL.findIndex((_,i)=>!used.includes(i));if(c<0)c=S.groups.length%PAL.length;
+  S.groups.push({id:'g'+uid(),name:v,c,members:sel&&N(sel)&&!N(sel).center?[sel]:[]});
+  $('newGroup').value='';save();render();
+};
+$('newGroup').addEventListener('keydown',e=>{if(e.key==='Enter'&&!e.isComposing)$('addGroup').click()});
+
+/* ---- データ ---- */
+const msg=t=>{const m=$('dataMsg');m.textContent=t;m.hidden=false;setTimeout(()=>m.hidden=true,4000)};
+$('exp').onclick=()=>{const txt=JSON.stringify(S);
+  const fallback=()=>{$('impBox').hidden=false;$('impText').value=txt;$('impText').select();msg('自動でコピーできなかったので、下の欄を選択しました。手動でコピーしてください。')};
+  try{navigator.clipboard.writeText(txt).then(()=>msg('コピーしました。メモ帳などに貼って保存できます。'),fallback)}catch(e){fallback()}};
+$('impToggle').onclick=()=>{$('impBox').hidden=!$('impBox').hidden;if(!$('impBox').hidden)$('impText').focus()};
+$('impGo').onclick=()=>{try{const d=JSON.parse($('impText').value);if(!valid(d))throw 0;
+  S=d;sel=null;focusG=null;save();render();fit();$('impBox').hidden=true;$('impText').value='';msg('読み込みました。')}
+  catch(e){msg('読み込めませんでした。「データをコピー」で書き出した文字をそのまま貼ってください。')}};
+$('toBlank').onclick=()=>{if(armed!=='blank'){armed='blank';panel();return}armed=null;S=blank();sel=null;focusG=null;save();render();fit()};
+$('toSample').onclick=()=>{if(armed!=='sample'){armed='sample';panel();return}armed=null;S=sample();sel=null;focusG=null;save();render();fit()};
+
+render();fit();
+</script>
+</body>
+</html>
